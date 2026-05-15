@@ -116,7 +116,7 @@ const GestionUsuarios = () => {
         <div className="flex gap-3">
           <button 
             onClick={() => { setEditingUser(null); setShowFormDocente(true); }}
-            className="px-6 py-3 bg-red-600 text-white rounded-2xl font-black text-sm uppercase tracking-widest shadow-lg shadow-red-100 hover:bg-red-700 transition-all flex items-center gap-2"
+            className="px-6 py-3 bg-blue-700 text-white rounded-2xl font-black text-sm uppercase tracking-widest shadow-lg shadow-blue-100 hover:bg-blue-800 transition-all flex items-center gap-2"
           >
             <UserPlus size={18} />
             Crear Docente
@@ -135,7 +135,7 @@ const GestionUsuarios = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {[
           { label: 'Total Usuarios', val: totalUsuarios, icon: Users, color: 'text-blue-600', bg: 'bg-blue-50' },
-          { label: 'Docentes', val: totalDocentes, icon: Shield, color: 'text-red-600', bg: 'bg-red-50' },
+          { label: 'Docentes', val: totalDocentes, icon: Shield, color: 'text-blue-700', bg: 'bg-blue-50' },
           { label: 'Estudiantes', val: totalEstudiantes, icon: GraduationCap, color: 'text-indigo-600', bg: 'bg-indigo-50' },
           { label: 'Usuarios Activos', val: totalActivos, icon: CheckCircle2, color: 'text-emerald-600', bg: 'bg-emerald-50' },
         ].map((s, i) => (

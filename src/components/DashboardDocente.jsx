@@ -105,7 +105,7 @@ export default function DashboardDocente() {
                     >
                       <StatsCard label="Estudiantes" value={estudiantesDocente.length} trend="+2 esta semana" icon={Users} color="text-blue-600" bg="bg-blue-50" />
                     </button>
-                    <StatsCard label="Promedio General" value={`${averageScore}%`} trend="Estable" icon={TrendingUp} color="text-red-600" bg="bg-red-50" />
+                    <StatsCard label="Promedio General" value={`${averageScore}%`} trend="Estable" icon={TrendingUp} color="text-indigo-600" bg="bg-indigo-50" />
                     <StatsCard label="Mis Grupos" value={user.gruposAsignados?.length || 0} trend="Activos" icon={LayoutGrid} color="text-purple-600" bg="bg-purple-50" />
                     <StatsCard label="Simulacros" value={simulacros.length} trend="Actualizado" icon={FileText} color="text-orange-600" bg="bg-orange-50" />
                   </div>
@@ -113,7 +113,7 @@ export default function DashboardDocente() {
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
                     <div className="bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-sm">
                       <h3 className="font-extrabold mb-8 text-slate-800 flex items-center gap-2">
-                        <TrendingUp className="text-red-600" />
+                        <TrendingUp className="text-blue-600" />
                         Desempeño por Competencia (Promedio)
                       </h3>
                       <div className="h-[350px]">
@@ -128,7 +128,7 @@ export default function DashboardDocente() {
                     <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden flex flex-col">
                       <div className="p-8 border-b border-slate-50 flex justify-between items-center bg-slate-50/30">
                         <h3 className="font-extrabold text-slate-800">Estudiantes en Riesgo</h3>
-                        <span className="text-[10px] font-black uppercase tracking-widest bg-red-100 text-red-600 px-3 py-1 rounded-full">
+                        <span className="text-[10px] font-black uppercase tracking-widest bg-blue-100 text-blue-700 px-3 py-1 rounded-full">
                           Bajo Desempeño
                         </span>
                       </div>
@@ -137,17 +137,17 @@ export default function DashboardDocente() {
                           estudiantesDocente.slice(0, 6).map((e, index) => (
                             <div key={index} className="px-8 py-4 flex items-center justify-between border-b border-slate-50 last:border-0 hover:bg-slate-50 group transition-all">
                               <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center font-black transition-colors group-hover:bg-red-100 group-hover:text-red-700">
+                                <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-700 flex items-center justify-center font-black transition-colors group-hover:bg-blue-100 group-hover:text-blue-800">
                                   {e.nombreCompleto?.charAt(0)}
                                 </div>
                                 <div>
-                                  <p className="font-extrabold text-slate-800 text-sm group-hover:text-red-600 transition-colors">{e.nombreCompleto}</p>
+                                  <p className="font-extrabold text-slate-800 text-sm group-hover:text-blue-700 transition-colors">{e.nombreCompleto}</p>
                                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Grupo: {e.grupo}</p>
                                 </div>
                               </div>
                               <button 
                                 onClick={() => setSelectedStudent(e)}
-                                className="p-3 bg-slate-50 rounded-xl text-slate-400 group-hover:bg-red-100 group-hover:text-red-600 transition-all"
+                                className="p-3 bg-slate-50 rounded-xl text-slate-400 group-hover:bg-blue-100 group-hover:text-blue-700 transition-all"
                               >
                                 <ArrowUpRight size={20} />
                               </button>

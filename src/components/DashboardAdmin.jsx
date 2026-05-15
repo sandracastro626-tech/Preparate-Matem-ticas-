@@ -28,7 +28,7 @@ export default function AdminDashboard() {
   
   const stats = [
     { label: 'Estudiantes', value: estudiantes.length, icon: Users, color: 'text-blue-600', bg: 'bg-blue-100' },
-    { label: 'Docentes', value: docentes.length, icon: GraduationCap, color: 'text-red-600', bg: 'bg-red-100' },
+    { label: 'Docentes', value: docentes.length, icon: GraduationCap, color: 'text-blue-700', bg: 'bg-blue-50' },
     { label: 'Preguntas', value: preguntasVisibles.length, icon: Book, color: 'text-emerald-600', bg: 'bg-emerald-100' },
     { label: 'Simulacros', value: simulacrosVisibles.length, icon: ListChecks, color: 'text-purple-600', bg: 'bg-purple-100' },
   ];
@@ -75,7 +75,7 @@ export default function AdminDashboard() {
                 <div className="bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-sm">
                   <div className="flex items-center justify-between mb-8">
                     <h3 className="text-lg font-black text-slate-800 flex items-center gap-3">
-                      <div className="p-2 bg-red-50 text-red-600 rounded-lg">
+                      <div className="p-2 bg-blue-50 text-blue-700 rounded-lg">
                         <TrendingUp size={20} />
                       </div>
                       Distribución de Niveles

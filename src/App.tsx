@@ -13,11 +13,13 @@ function AppContent() {
     return <Login />;
   }
 
-  if (user.debeCambiarContrasena) {
+  const rol = String(user.rol || "").toLowerCase();
+
+  if (user.debeCambiarContrasena && rol === 'administrador') {
     return <ChangePassword />;
   }
 
-  switch (user.rol) {
+  switch (rol) {
     case 'ADMIN':
     case 'administrador':
       return <DashboardAdmin />;

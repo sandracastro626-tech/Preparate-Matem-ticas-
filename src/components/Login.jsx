@@ -28,12 +28,12 @@ export default function Login() {
       <div className="max-w-4xl w-full grid grid-cols-1 md:grid-cols-2 bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-100">
         
         {/* Left Side: Info */}
-        <div className="p-8 md:p-12 bg-red-600 text-white flex flex-col justify-center">
+        <div className="p-8 md:p-12 bg-gradient-to-br from-blue-700 via-blue-800 to-slate-900 text-white flex flex-col justify-center">
           <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mb-6">
             <GraduationCap size={40} className="text-white" />
           </div>
           <h1 className="text-4xl font-black mb-2 tracking-tight">CHECK-ICFES</h1>
-          <p className="text-red-100 mb-8 text-lg font-bold uppercase tracking-widest text-[12px]">
+          <p className="text-blue-100 mb-8 text-lg font-bold uppercase tracking-widest text-[12px]">
             Matemáticas Saber 11°
           </p>
           <div className="space-y-5">
@@ -75,7 +75,7 @@ export default function Login() {
               <input 
                 type="text" required
                 placeholder="Ingresa tu usuario"
-                className="w-full px-5 py-4 rounded-2xl border-2 border-slate-100 focus:ring-4 focus:ring-red-50 focus:border-red-500 outline-none transition-all placeholder:text-slate-300 font-bold"
+                className="w-full px-5 py-4 rounded-2xl border-2 border-slate-100 focus:ring-4 focus:ring-blue-50 focus:border-blue-600 outline-none transition-all placeholder:text-slate-300 font-bold"
                 value={formData.email}
                 onChange={e => setFormData({...formData, email: e.target.value})}
               />
@@ -85,7 +85,7 @@ export default function Login() {
               <input 
                 type="password" required
                 placeholder="••••••••"
-                className="w-full px-5 py-4 rounded-2xl border-2 border-slate-100 focus:ring-4 focus:ring-red-50 focus:border-red-500 outline-none transition-all placeholder:text-slate-300 font-bold"
+                className="w-full px-5 py-4 rounded-2xl border-2 border-slate-100 focus:ring-4 focus:ring-blue-50 focus:border-blue-600 outline-none transition-all placeholder:text-slate-300 font-bold"
                 value={formData.password}
                 onChange={e => setFormData({...formData, password: e.target.value})}
               />
@@ -101,7 +101,7 @@ export default function Login() {
             <button 
               type="submit"
               disabled={isLoading}
-              className="w-full py-5 bg-red-600 hover:bg-red-700 text-white rounded-2xl font-black flex items-center justify-center gap-3 transition-all mt-8 shadow-xl shadow-red-500/10 disabled:opacity-70 uppercase tracking-widest text-sm"
+              className="w-full py-5 bg-blue-700 hover:bg-blue-800 text-white rounded-2xl font-black flex items-center justify-center gap-3 transition-all mt-8 shadow-xl shadow-blue-500/10 disabled:opacity-70 uppercase tracking-widest text-sm"
             >
               {isLoading ? 'Verificando...' : 'Iniciar Sesión'}
               {!isLoading && <ArrowRight size={20} />}
@@ -110,7 +110,7 @@ export default function Login() {
 
           <div className="mt-10 text-center">
             <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest">
-              ¿Olvidaste tu contraseña? <span className="text-red-600 font-black cursor-pointer hover:underline">Contacta al Administrador</span>
+              ¿Olvidaste tu contraseña? <span className="text-blue-700 font-black cursor-pointer hover:underline">Contacta al Administrador</span>
             </p>
           </div>
         </div>

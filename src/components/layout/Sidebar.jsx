@@ -58,12 +58,12 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
     <div className="w-72 bg-[#0f172a] text-white h-screen flex flex-col sticky top-0 overflow-y-auto">
       <div className="p-8">
         <div className="flex items-center gap-3 mb-12">
-          <div className="w-10 h-10 bg-red-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-red-900/20">
+          <div className="w-10 h-10 bg-blue-700 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-900/20">
             <BookOpen size={24} />
           </div>
           <div>
-            <span className="text-xl font-black tracking-tight block leading-none">CHECK-ICFES</span>
-            <span className="text-[10px] font-bold text-red-500 uppercase tracking-widest">Matemáticas</span>
+            <span className="text-xl font-black tracking-tight block leading-none text-white">CHECK-ICFES</span>
+            <span className="text-[10px] font-bold text-blue-400 uppercase tracking-widest">Matemáticas</span>
           </div>
         </div>
 
@@ -94,7 +94,7 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
         <div className="flex flex-col gap-4">
           <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-2">Usuario</p>
           <div className="flex items-center gap-3 p-4 bg-white/5 rounded-[2rem] border border-white/5 shadow-inner">
-            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black text-white shadow-lg ${rol === 'administrador' ? 'bg-red-700' : rol === 'docente' ? 'bg-red-600' : 'bg-red-500'}`}>
+            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black text-white shadow-lg ${rol === 'administrador' ? 'bg-blue-800' : rol === 'docente' ? 'bg-blue-700' : 'bg-blue-600'}`}>
               {user?.nombreCompleto?.charAt(0)}
             </div>
             <div className="overflow-hidden">

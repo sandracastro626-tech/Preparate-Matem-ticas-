@@ -171,13 +171,13 @@ export default function DashboardEstudiante() {
       <div className="flex-1 flex flex-col">
         <Header title={title} subtitle={subtitle} user={user} onNavigate={setActiveTab}>
            <div className="relative hidden md:block group">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-red-600 transition-colors" size={20} />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors" size={20} />
             <input 
               type="text" 
               placeholder="Buscar en el panel..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="bg-slate-50 border-none rounded-2xl pl-12 pr-6 py-3 w-64 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-red-600/10 focus:w-80 transition-all placeholder:text-slate-400"
+              className="bg-slate-50 border-none rounded-2xl pl-12 pr-6 py-3 w-64 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-blue-600/10 focus:w-80 transition-all placeholder:text-slate-400"
             />
           </div>
         </Header>
@@ -245,7 +245,7 @@ function DrillCard({ drill, onStart, misResultados }) {
       <div className="mb-6 flex-1">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <span className="px-2 py-0.5 bg-red-50 text-red-600 rounded text-[10px] font-black uppercase tracking-widest">Matemáticas</span>
+            <span className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded text-[10px] font-black uppercase tracking-widest">Matemáticas</span>
             {vencido ? (
               <span className="px-2 py-0.5 bg-rose-50 text-rose-600 rounded text-[10px] font-black uppercase tracking-widest">Vencido</span>
             ) : futuro ? (
@@ -258,7 +258,7 @@ function DrillCard({ drill, onStart, misResultados }) {
             {drill.autorRol === 'administrador' ? 'OFICIAL' : 'DOCENTE'}
           </p>
         </div>
-        <h4 className="font-black text-slate-800 text-lg mb-2 group-hover:text-red-600 transition-colors uppercase tracking-tight">{drill.nombre}</h4>
+        <h4 className="font-black text-slate-800 text-lg mb-2 group-hover:text-blue-700 transition-colors uppercase tracking-tight">{drill.nombre}</h4>
         <p className="text-sm text-slate-400 font-medium leading-relaxed line-clamp-2 mb-4">{drill.descripcion}</p>
         
         <div className="grid grid-cols-2 gap-4 mb-4">
@@ -298,7 +298,7 @@ function DrillCard({ drill, onStart, misResultados }) {
       ) : (
         <button 
           onClick={onStart}
-          className="w-full py-4 bg-red-600 text-white font-black rounded-2xl hover:bg-red-700 transition-all flex items-center justify-center gap-3 shadow-lg shadow-red-500/10 hover:shadow-red-500/20"
+          className="w-full py-4 bg-blue-700 text-white font-black rounded-2xl hover:bg-blue-800 transition-all flex items-center justify-center gap-3 shadow-lg shadow-blue-500/10 hover:shadow-blue-500/20"
         >
           COMENZAR EXAMEN
         </button>

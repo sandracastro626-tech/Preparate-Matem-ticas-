@@ -12,6 +12,8 @@ export default function ChangePassword() {
   const [showNew, setShowNew] = useState(false);
   const [error, setError] = useState('');
 
+  const rol = String(user?.rol || "").toLowerCase();
+
   const validatePassword = (pass) => {
     if (pass.length < 8) return "La contraseña debe tener al menos 8 caracteres.";
     if (!/[A-Z]/.test(pass)) return "La contraseña debe tener al menos una letra mayúscula.";
@@ -23,7 +25,8 @@ export default function ChangePassword() {
     e.preventDefault();
     setError('');
 
-    if (currentPassword !== user.password) {
+    const passwordSistema = String(user?.contrasena || user?.password || "").trim();
+    if (currentPassword !== passwordSistema) {
       setError('La contraseña actual es incorrecta.');
       return;
     }

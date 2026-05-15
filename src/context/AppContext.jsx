@@ -120,7 +120,31 @@ export function AppProvider({ children }) {
 
   useEffect(() => {
     inicializarAdministradorPrincipal();
+    desactivarCambioContrasenaDocentesEstudiantes();
   }, []);
+
+  const desactivarCambioContrasenaDocentesEstudiantes = () => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS.usuarios);
+      if (!saved) return;
+      
+      const usuariosList = JSON.parse(saved) || [];
+      const usuariosActualizados = usuariosList.map((usuario) => {
+        const rol = String(usuario.rol || "").toLowerCase();
+        if (rol === "docente" || rol === "estudiante") {
+          return { ...usuario, debeCambiarContrasena: false };
+        }
+        return usuario;
+      });
+
+      localStorage.setItem(STORAGE_KEYS.usuarios, JSON.stringify(usuariosActualizados));
+      setUsuarios(usuariosActualizados.map(normalizarUsuario));
+      window.dispatchEvent(new CustomEvent('usuariosActualizadas'));
+      window.dispatchEvent(new CustomEvent('datosGlobalesActualizados'));
+    } catch (e) {
+      console.error("Error disabling password change for teachers/students:", e);
+    }
+  };
 
   const [preguntas, setPreguntas] = useState(() => {
     try {
@@ -304,7 +328,7 @@ export function AppProvider({ children }) {
     }
     
     userToSave.fechaCreacion = new Date().toISOString();
-    userToSave.debeCambiarContrasena = true;
+    userToSave.debeCambiarContrasena = false;
     userToSave.estado = userToSave.estado || "activo";
 
     // Metadata específica para docentes iniciales
@@ -384,7 +408,7 @@ export function AppProvider({ children }) {
   };
 
   const resetPassword = (userId, newPassword) => {
-    setUsuarios(prev => prev.map(u => u.id === userId ? { ...u, contrasena: newPassword, debeCambiarContrasena: true } : u));
+    setUsuarios(prev => prev.map(u => u.id === userId ? { ...u, contrasena: newPassword, debeCambiarContrasena: false } : u));
     return { success: true };
   };
 
@@ -413,7 +437,7 @@ export function AppProvider({ children }) {
         rol,
         id: rol === 'docente' ? `docente_bulk_${Date.now()}_${index}` : rol === 'estudiante' ? `user_bulk_${Date.now()}_${index}` : `admin_bulk_${Date.now()}_${index}`,
         fechaCreacion: new Date().toISOString(),
-        debeCambiarContrasena: true,
+        debeCambiarContrasena: false,
         estado: csvUser.estado || 'activo',
         contrasena: csvUser.contrasenaTemporal || csvUser.contrasena || csvUser.password || 'Temp123*'
       };
