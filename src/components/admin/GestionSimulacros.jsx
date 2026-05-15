@@ -69,7 +69,7 @@ export default function GestionSimulacros() {
         </div>
         <button 
           onClick={() => { setEditingSimulacro(null); setShowForm(true); }}
-          className="bg-indigo-600 text-white px-8 py-4 rounded-2xl font-black shadow-lg shadow-indigo-100 hover:bg-indigo-700 transition-all flex items-center gap-2 uppercase tracking-widest text-sm"
+          className="bg-red-600 text-white px-8 py-4 rounded-2xl font-black shadow-lg shadow-red-500/10 hover:bg-red-700 transition-all flex items-center gap-2 uppercase tracking-widest text-sm"
         >
           <Plus size={20} />
           Crear Simulacro
@@ -87,7 +87,7 @@ export default function GestionSimulacros() {
               animate={{ opacity: 1, y: 0 }}
               className="bg-white rounded-[3rem] border border-slate-100 shadow-sm hover:shadow-xl transition-all overflow-hidden group flex flex-col"
             >
-              <div className={`p-8 ${s.estado === 'activo' ? 'bg-indigo-600' : 'bg-slate-400'} text-white relative overflow-hidden`}>
+              <div className={`p-8 ${s.estado === 'activo' ? 'bg-red-600' : 'bg-slate-400'} text-white relative overflow-hidden`}>
                 <div className="relative z-10">
                   <div className="flex justify-between items-start mb-4">
                     <span className="bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">
@@ -109,14 +109,14 @@ export default function GestionSimulacros() {
                   <div className="flex flex-col">
                     <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Preguntas</span>
                     <div className="flex items-center gap-2 text-slate-700 font-black">
-                      <ListChecks size={16} className="text-indigo-600" />
+                      <ListChecks size={16} className="text-red-600" />
                       {s.numeroPreguntas || s.preguntasIds?.length || 0}
                     </div>
                   </div>
                   <div className="flex flex-col">
                     <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Tiempo</span>
                     <div className="flex items-center gap-2 text-slate-700 font-black">
-                      <Clock size={16} className="text-indigo-600" />
+                      <Clock size={16} className="text-red-600" />
                       {s.tiempoMinutos || 60} min
                     </div>
                   </div>
@@ -141,7 +141,7 @@ export default function GestionSimulacros() {
               <div className="p-6 bg-slate-50 flex gap-2">
                 <button 
                   onClick={() => handleEdit(s)}
-                  className="flex-1 p-3 bg-white border border-slate-200 text-slate-400 hover:text-indigo-600 hover:border-indigo-100 rounded-2xl transition-all flex items-center justify-center gap-2 font-black text-[10px] uppercase tracking-widest"
+                  className="flex-1 p-3 bg-white border border-slate-200 text-slate-400 hover:text-red-600 hover:border-red-100 rounded-2xl transition-all flex items-center justify-center gap-2 font-black text-[10px] uppercase tracking-widest"
                 >
                   <Edit2 size={16} />
                   Editar

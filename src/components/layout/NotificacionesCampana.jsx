@@ -78,9 +78,9 @@ export default function NotificacionesCampana({ usuarioActual, setVistaActual })
     switch (prioridad) {
       case 'urgente': return 'bg-rose-500';
       case 'alta': return 'bg-amber-500';
-      case 'media': return 'bg-indigo-500';
+      case 'media': return 'bg-red-500';
       case 'baja': return 'bg-slate-400';
-      default: return 'bg-indigo-500';
+      default: return 'bg-red-500';
     }
   };
 
@@ -88,7 +88,7 @@ export default function NotificacionesCampana({ usuarioActual, setVistaActual })
     switch (tipo) {
       case 'simulacro_asignado': 
       case 'actividad_nueva':
-        return <BookOpen className="text-indigo-500" size={16} />;
+        return <BookOpen className="text-red-500" size={16} />;
       case 'simulacro_realizado': 
       case 'reporte_generado':
         return <CheckCircle2 className="text-emerald-500" size={16} />;
@@ -104,7 +104,7 @@ export default function NotificacionesCampana({ usuarioActual, setVistaActual })
     <div className="relative" ref={panelRef}>
       <button 
         onClick={handleToggle}
-        className={`relative p-2 rounded-xl transition-all ${isOpen ? 'bg-indigo-50 text-indigo-600' : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50'}`}
+        className={`relative p-2 rounded-xl transition-all ${isOpen ? 'bg-red-50 text-red-600' : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50'}`}
       >
         <Bell size={20} />
         {noLeidas > 0 && (
@@ -120,7 +120,7 @@ export default function NotificacionesCampana({ usuarioActual, setVistaActual })
             initial={{ opacity: 0, scale: 0.95, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
-            className="absolute right-0 mt-4 w-96 bg-white rounded-[2rem] shadow-2xl shadow-indigo-200/50 border border-slate-100 z-50 overflow-hidden"
+            className="absolute right-0 mt-4 w-96 bg-white rounded-[2rem] shadow-2xl shadow-red-200/50 border border-slate-100 z-50 overflow-hidden"
           >
             <div className="p-6 border-b border-slate-50 flex items-center justify-between bg-slate-50/30">
               <div>
@@ -151,7 +151,7 @@ export default function NotificacionesCampana({ usuarioActual, setVistaActual })
                     <div 
                       key={notif.id}
                       onClick={() => handleNotificacionClick(notif)}
-                      className={`p-6 hover:bg-slate-50/50 transition-all cursor-pointer group relative ${!notif.leida ? 'bg-indigo-50/30' : ''}`}
+                      className={`p-6 hover:bg-slate-50/50 transition-all cursor-pointer group relative ${!notif.leida ? 'bg-red-50/30' : ''}`}
                     >
                       <div className="flex gap-4">
                         <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${!notif.leida ? 'bg-white shadow-sm' : 'bg-slate-50 opacity-60'}`}>
@@ -172,7 +172,7 @@ export default function NotificacionesCampana({ usuarioActual, setVistaActual })
                               <Clock size={12} /> {formatearFechaRelativa(notif.fechaCreacion)}
                             </span>
                             {notif.enlace && (
-                              <span className="flex items-center gap-1 text-[10px] text-indigo-500 font-black uppercase tracking-widest">
+                              <span className="flex items-center gap-1 text-[10px] text-red-500 font-black uppercase tracking-widest">
                                 <ExternalLink size={10} /> {notif.enlace}
                               </span>
                             )}
@@ -208,7 +208,7 @@ export default function NotificacionesCampana({ usuarioActual, setVistaActual })
               {notificaciones.length > 0 && (
                 <button 
                   onClick={handleMarcarTodas}
-                  className="text-[10px] font-black text-indigo-600 uppercase tracking-widest hover:underline px-4 py-2"
+                  className="text-[10px] font-black text-red-600 uppercase tracking-widest hover:underline px-4 py-2"
                 >
                   Marcar todas como leídas
                 </button>

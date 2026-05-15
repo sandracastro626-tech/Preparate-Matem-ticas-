@@ -81,8 +81,8 @@ export default function BancoPreguntas() {
           label="Total banco" 
           value={preguntas.filter(p => !p.estado || p.estado !== 'eliminada').length} 
           icon={Book} 
-          color="text-indigo-600" 
-          bg="bg-indigo-50" 
+          color="text-red-600" 
+          bg="bg-red-50" 
         />
         <StatsCard 
           label="Interpretación" 
@@ -114,14 +114,14 @@ export default function BancoPreguntas() {
           <input 
             type="text"
             placeholder="Buscar por enunciado o componente..."
-            className="w-full pl-12 pr-4 py-3 rounded-2xl bg-slate-50 border-2 border-slate-50 focus:border-indigo-500 focus:bg-white outline-none transition-all font-medium text-slate-800"
+            className="w-full pl-12 pr-4 py-3 rounded-2xl bg-slate-50 border-2 border-slate-50 focus:border-red-500 focus:bg-white outline-none transition-all font-medium text-slate-800"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
         <div className="flex gap-2 w-full md:w-auto">
           <select 
-            className="px-4 py-3 rounded-2xl bg-slate-50 border-2 border-slate-50 outline-none focus:border-indigo-500 font-bold text-sm text-slate-600"
+            className="px-4 py-3 rounded-2xl bg-slate-50 border-2 border-slate-50 outline-none focus:border-red-500 font-bold text-sm text-slate-600"
             value={filterCompetencia}
             onChange={(e) => setFilterCompetencia(e.target.value)}
           >
@@ -131,7 +131,7 @@ export default function BancoPreguntas() {
             <option value="Argumentación">Argumentación</option>
           </select>
           <select 
-            className="px-4 py-3 rounded-2xl bg-slate-50 border-2 border-slate-50 outline-none focus:border-indigo-500 font-bold text-sm text-slate-600"
+            className="px-4 py-3 rounded-2xl bg-slate-50 border-2 border-slate-50 outline-none focus:border-red-500 font-bold text-sm text-slate-600"
             value={filterDificultad}
             onChange={(e) => setFilterDificultad(e.target.value)}
           >
@@ -142,7 +142,7 @@ export default function BancoPreguntas() {
           </select>
           <button 
             onClick={() => { setEditingPregunta(null); setShowForm(true); }}
-            className="bg-indigo-600 text-white px-6 py-3 rounded-2xl text-sm font-black shadow-lg shadow-indigo-100 hover:bg-indigo-700 transition-all flex items-center gap-2"
+            className="bg-red-600 text-white px-6 py-3 rounded-2xl text-sm font-black shadow-lg shadow-red-500/10 hover:bg-red-700 transition-all flex items-center gap-2"
           >
             <Plus size={20} />
             Nueva Pregunta
@@ -169,7 +169,7 @@ export default function BancoPreguntas() {
                   <tr key={p.id} className="hover:bg-slate-50/30 transition-all group">
                     <td className="p-6">
                       <div className="flex items-start gap-4">
-                        <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0 font-black text-xs">
+                        <div className="w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center shrink-0 font-black text-xs">
                           {p.id}
                         </div>
                         <div className="max-w-md">
@@ -188,7 +188,7 @@ export default function BancoPreguntas() {
                     <td className="p-6">
                       <div className="flex flex-col">
                         <p className="text-sm font-bold text-slate-700 truncate max-w-[120px]">{p.autorNombre || (p.creadoPor === 'admin' ? 'Administrador' : 'Docente')}</p>
-                        <p className={`text-[9px] font-black uppercase tracking-widest ${p.creadoPor === 'admin' ? 'text-indigo-500' : 'text-amber-500'}`}>
+                        <p className={`text-[9px] font-black uppercase tracking-widest ${p.creadoPor === 'admin' ? 'text-red-500' : 'text-amber-500'}`}>
                           {p.creadoPor === 'admin' ? 'Oficial' : 'Externo'}
                         </p>
                       </div>
@@ -207,7 +207,7 @@ export default function BancoPreguntas() {
                       <div className="flex items-center justify-end gap-2">
                         <button 
                           onClick={() => handleEdit(p)}
-                          className="p-3 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all"
+                          className="p-3 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all"
                           title="Editar"
                         >
                           <Edit2 size={18} />

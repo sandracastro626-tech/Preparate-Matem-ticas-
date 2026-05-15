@@ -15,22 +15,12 @@ export default function Login() {
     
     // Simulate slight delay for professional feel
     setTimeout(() => {
-      console.log("=== INICIANDO LOGIN EN LOGIN.JSX ===");
       const res = login(formData.email, formData.password);
       if (!res.success) {
-        console.error("Error en login:", res.message);
         setError(res.message);
         setIsLoading(false);
-      } else {
-        console.log("Login exitoso:", res.user);
       }
     }, 500);
-  };
-
-  const verUsuarios = () => {
-    const usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
-    console.log("=== USUARIOS EN LOCALSTORAGE ===");
-    console.table(usuarios);
   };
 
   return (
@@ -38,94 +28,71 @@ export default function Login() {
       <div className="max-w-4xl w-full grid grid-cols-1 md:grid-cols-2 bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-100">
         
         {/* Left Side: Info */}
-        <div className="p-8 md:p-12 bg-indigo-700 text-white flex flex-col justify-center">
+        <div className="p-8 md:p-12 bg-red-600 text-white flex flex-col justify-center">
           <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mb-6">
             <GraduationCap size={40} className="text-white" />
           </div>
-          <h1 className="text-4xl font-bold mb-4 tracking-tight">Check ICFES</h1>
-          <p className="text-indigo-100 mb-8 text-lg font-medium">
-            Matemáticas Saber 11° Pro
+          <h1 className="text-4xl font-black mb-2 tracking-tight">CHECK-ICFES</h1>
+          <p className="text-red-100 mb-8 text-lg font-bold uppercase tracking-widest text-[12px]">
+            Matemáticas Saber 11°
           </p>
           <div className="space-y-5">
             <div className="flex items-center gap-4">
               <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center border border-white/10">
                 <BookOpen size={20}/>
               </div>
-              <span className="font-medium">Gestión de simulacros y resultados</span>
+              <span className="font-bold">Gestión de simulacros y resultados</span>
             </div>
             <div className="flex items-center gap-4">
               <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center border border-white/10">
                 <LogIn size={20}/>
               </div>
-              <span className="font-medium">Acceso seguro por roles</span>
+              <span className="font-bold">Acceso seguro por roles</span>
             </div>
             <div className="flex items-center gap-4">
               <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center border border-white/10">
                 <User size={20}/>
               </div>
-              <span className="font-medium">Seguimiento personalizado</span>
+              <span className="font-bold">Seguimiento personalizado</span>
             </div>
           </div>
-          
-          <div className="mt-12 space-y-3">
-            <div className="p-3 bg-indigo-800/50 rounded-xl border border-indigo-500/30">
-              <p className="text-[10px] text-indigo-200 uppercase font-bold tracking-widest mb-1">Admin</p>
-              <p className="text-xs font-mono text-white/90">admin / Admin123*</p>
-            </div>
-            <div className="p-3 bg-indigo-800/50 rounded-xl border border-indigo-500/30">
-              <p className="text-[10px] text-indigo-200 uppercase font-bold tracking-widest mb-1">Docente</p>
-              <p className="text-xs font-mono text-white/90">docente / Docente123*</p>
-            </div>
-            <div className="p-3 bg-indigo-800/50 rounded-xl border border-indigo-500/30">
-              <p className="text-[10px] text-indigo-200 uppercase font-bold tracking-widest mb-1">Estudiante</p>
-              <p className="text-xs font-mono text-white/90">estudiante / Estudiante123*</p>
-            </div>
-          </div>
-
-          <button 
-            type="button"
-            onClick={verUsuarios}
-            className="mt-6 w-full py-2 bg-slate-800 text-white rounded-xl text-xs font-bold hover:bg-slate-900 transition-colors"
-          >
-            Ver usuarios guardados (Consola)
-          </button>
         </div>
 
         {/* Right Side: Form */}
         <div className="p-8 md:p-12 flex flex-col justify-center bg-white relative">
-          <div className="absolute top-0 right-0 p-8 opacity-10">
+          <div className="absolute top-0 right-0 p-8 opacity-5">
             <LogIn size={150} />
           </div>
           
-          <h2 className="text-3xl font-extrabold text-slate-800 mb-2">Ingresar</h2>
-          <p className="text-slate-500 mb-10 font-medium">
-            Ingresa a tu panel con tus credenciales asignadas.
+          <h2 className="text-3xl font-black text-slate-800 mb-2">Ingresar</h2>
+          <p className="text-slate-500 mb-10 font-bold text-sm">
+            Bienvenido de nuevo. Ingresa tus credenciales para acceder a tu panel.
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-5 relative z-10">
             <div>
-              <label className="block text-sm font-bold text-slate-700 mb-2">Correo o Usuario</label>
+              <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Correo o Usuario</label>
               <input 
                 type="text" required
-                placeholder="ejemplo@checkicfes.com"
-                className="w-full px-5 py-3 rounded-2xl border border-slate-200 focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-300"
+                placeholder="Ingresa tu usuario"
+                className="w-full px-5 py-4 rounded-2xl border-2 border-slate-100 focus:ring-4 focus:ring-red-50 focus:border-red-500 outline-none transition-all placeholder:text-slate-300 font-bold"
                 value={formData.email}
                 onChange={e => setFormData({...formData, email: e.target.value})}
               />
             </div>
             <div>
-              <label className="block text-sm font-bold text-slate-700 mb-2">Contraseña</label>
+              <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Contraseña</label>
               <input 
                 type="password" required
                 placeholder="••••••••"
-                className="w-full px-5 py-3 rounded-2xl border border-slate-200 focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-300"
+                className="w-full px-5 py-4 rounded-2xl border-2 border-slate-100 focus:ring-4 focus:ring-red-50 focus:border-red-500 outline-none transition-all placeholder:text-slate-300 font-bold"
                 value={formData.password}
                 onChange={e => setFormData({...formData, password: e.target.value})}
               />
             </div>
             
             {error && (
-              <div className="bg-red-50 text-red-600 p-4 rounded-xl text-sm font-medium border border-red-100 flex items-center gap-2">
+              <div className="bg-red-50 text-red-600 p-4 rounded-2xl text-[11px] font-black border border-red-100 flex items-center gap-3 uppercase tracking-wider">
                 <AlertCircle size={18} />
                 {error}
               </div>
@@ -134,16 +101,16 @@ export default function Login() {
             <button 
               type="submit"
               disabled={isLoading}
-              className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-bold flex items-center justify-center gap-2 transition-all mt-8 shadow-xl shadow-indigo-100 disabled:opacity-70"
+              className="w-full py-5 bg-red-600 hover:bg-red-700 text-white rounded-2xl font-black flex items-center justify-center gap-3 transition-all mt-8 shadow-xl shadow-red-500/10 disabled:opacity-70 uppercase tracking-widest text-sm"
             >
-              {isLoading ? 'Verificando...' : 'Entrar a la plataforma'}
+              {isLoading ? 'Verificando...' : 'Iniciar Sesión'}
               {!isLoading && <ArrowRight size={20} />}
             </button>
           </form>
 
           <div className="mt-10 text-center">
-            <p className="text-slate-400 text-sm">
-              ¿Olvidaste tu contraseña? <span className="text-indigo-600 font-bold cursor-pointer hover:underline">Contacta a tu administrador</span>
+            <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest">
+              ¿Olvidaste tu contraseña? <span className="text-red-600 font-black cursor-pointer hover:underline">Contacta al Administrador</span>
             </p>
           </div>
         </div>

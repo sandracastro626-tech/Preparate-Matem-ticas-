@@ -25,7 +25,7 @@ const Header = ({ title, subtitle, user, onNavigate, children }) => {
             <span className="block text-xs font-bold text-slate-800">{user?.nombreCompleto || 'Usuario'}</span>
             <span className="block text-[10px] text-slate-400 font-bold uppercase tracking-widest">{user?.rol || 'Visitante'}</span>
           </div>
-          <div className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center text-slate-400 group-hover:text-indigo-600 group-hover:bg-indigo-50 transition-all">
+          <div className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center text-slate-400 group-hover:text-red-600 group-hover:bg-red-50 transition-all">
             <User size={20} />
           </div>
         </button>

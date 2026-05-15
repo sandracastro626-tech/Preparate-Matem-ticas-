@@ -241,14 +241,10 @@ export function AppProvider({ children }) {
 
     const contrasenaSistema = String(usuarioEncontrado.contrasena).trim();
     if (contrasenaSistema !== claveIngresada) {
-      console.log("Fallo de contraseña:");
-      console.log("Esperada:", contrasenaSistema);
-      console.log("Recibida:", claveIngresada);
       return { success: false, message: "Usuario o contraseña incorrecta." };
     }
 
     const rol = usuarioEncontrado.rol;
-    console.log("Rol detectado:", rol);
     
     localStorage.setItem('usuarioActual', JSON.stringify(usuarioEncontrado));
     localStorage.setItem('sesionActiva', 'true');

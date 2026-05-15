@@ -166,14 +166,14 @@ export default function GestionUsuarios() {
         <div className="flex flex-wrap gap-2">
           <button 
             onClick={() => { setEditingUser(null); setShowFormDocente(true); }}
-            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-all shadow-sm"
+            className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition-all shadow-sm"
           >
             <UserPlus size={18} />
             Crear Docente
           </button>
           <button 
             onClick={() => { setEditingUser(null); setShowFormEstudiante(true); }}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-all shadow-sm"
+            className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition-all shadow-sm"
           >
             <UserPlus size={18} />
             Crear Estudiante
@@ -210,10 +210,10 @@ export default function GestionUsuarios() {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { icon: Users, label: 'Total Usuarios', val: usuarios.length, color: 'text-indigo-600', bg: 'bg-indigo-50' },
-          { icon: UserRound, label: 'Docentes', val: docentes.length, color: 'text-purple-600', bg: 'bg-purple-50' },
-          { icon: GraduationCap, label: 'Estudiantes', val: estudiantes.length, color: 'text-blue-600', bg: 'bg-blue-50' },
-          { icon: CheckCircle2, label: 'Cuentas Activas', val: activos.length, color: 'text-emerald-600', bg: 'bg-emerald-50' }
+          { icon: Users, label: 'Total Usuarios', val: usuarios.length, color: 'text-red-600', bg: 'bg-red-50' },
+          { icon: UserRound, label: 'Docentes', val: docentes.length, color: 'text-red-600', bg: 'bg-red-50' },
+          { icon: GraduationCap, label: 'Estudiantes', val: estudiantes.length, color: 'text-red-600', bg: 'bg-red-50' },
+          { icon: CheckCircle2, label: 'Cuentas Activas', val: activos.length, color: 'text-green-600', bg: 'bg-green-50' }
         ].map((stat, i) => (
           <motion.div 
             key={i}

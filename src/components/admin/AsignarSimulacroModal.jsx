@@ -90,17 +90,17 @@ export default function AsignarSimulacroModal({ simulacro, onSave, onCancel }) {
         className="bg-white w-full max-w-4xl rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
       >
         {/* Header */}
-        <div className="p-8 border-b border-slate-100 flex justify-between items-center bg-indigo-50">
+        <div className="p-8 border-b border-slate-100 flex justify-between items-center bg-red-50">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-white text-indigo-600 rounded-2xl shadow-sm">
+            <div className="p-3 bg-white text-red-600 rounded-2xl shadow-sm">
               <Users size={24} />
             </div>
             <div>
-              <h3 className="text-xl font-black text-indigo-900">Asignar Simulacro</h3>
-              <p className="text-indigo-700/70 text-[10px] font-black uppercase tracking-widest">{simulacro.nombre}</p>
+              <h3 className="text-xl font-black text-red-900">Asignar Simulacro</h3>
+              <p className="text-red-700/70 text-[10px] font-black uppercase tracking-widest">{simulacro.nombre}</p>
             </div>
           </div>
-          <button onClick={onCancel} className="p-2 hover:bg-indigo-100 rounded-xl transition-all text-indigo-400">
+          <button onClick={onCancel} className="p-2 hover:bg-red-100 rounded-xl transition-all text-red-400">
             <X size={24} />
           </button>
         </div>
@@ -121,8 +121,8 @@ export default function AsignarSimulacroModal({ simulacro, onSave, onCancel }) {
                   onClick={() => setTipoAsignacion(tipo.id)}
                   className={`p-4 rounded-3xl border-2 transition-all flex flex-col items-center gap-3 text-center group
                     ${tipoAsignacion === tipo.id 
-                      ? 'border-indigo-600 bg-indigo-50 text-indigo-600' 
-                      : 'border-slate-100 hover:border-indigo-200 text-slate-400'}`}
+                      ? 'border-red-600 bg-red-50 text-red-600' 
+                      : 'border-slate-100 hover:border-red-200 text-slate-400'}`}
                 >
                   <tipo.icon size={24} className={tipoAsignacion === tipo.id ? 'animate-bounce' : 'group-hover:scale-110 transition-all'} />
                   <span className="text-xs font-black uppercase tracking-widest">{tipo.label}</span>
@@ -145,7 +145,7 @@ export default function AsignarSimulacroModal({ simulacro, onSave, onCancel }) {
                   <select
                     value={institucionSeleccionada}
                     onChange={(e) => { setInstitucionSeleccionada(e.target.value); setGrupoSeleccionado(''); }}
-                    className="w-full px-4 py-3 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:border-indigo-500 transition-all appearance-none outline-none font-bold text-slate-700"
+                    className="w-full px-4 py-3 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:border-red-500 transition-all appearance-none outline-none font-bold text-slate-700"
                   >
                     <option value="">Seleccione Institución</option>
                     {instituciones.map(inst => <option key={inst} value={inst}>{inst}</option>)}
@@ -162,7 +162,7 @@ export default function AsignarSimulacroModal({ simulacro, onSave, onCancel }) {
                       value={grupoSeleccionado}
                       onChange={(e) => setGrupoSeleccionado(e.target.value)}
                       disabled={!institucionSeleccionada}
-                      className="w-full px-4 py-3 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:border-indigo-500 transition-all appearance-none outline-none font-bold text-slate-700 disabled:opacity-50"
+                      className="w-full px-4 py-3 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:border-red-500 transition-all appearance-none outline-none font-bold text-slate-700 disabled:opacity-50"
                     >
                       <option value="">Seleccione Grupo</option>
                       {grupos.map(g => <option key={g} value={g}>{g}</option>)}
@@ -188,7 +188,7 @@ export default function AsignarSimulacroModal({ simulacro, onSave, onCancel }) {
                         placeholder="Buscar por nombre o código..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2 border-2 border-slate-100 rounded-xl focus:border-indigo-500 outline-none text-sm font-bold"
+                        className="w-full pl-10 pr-4 py-2 border-2 border-slate-100 rounded-xl focus:border-red-500 outline-none text-sm font-bold"
                       />
                    </div>
                 </div>
@@ -221,7 +221,7 @@ export default function AsignarSimulacroModal({ simulacro, onSave, onCancel }) {
                 </div>
                 <div className="flex justify-between items-center bg-slate-50 p-4 rounded-2xl">
                   <span className="text-xs font-bold text-slate-500">
-                    Seleccionados: <span className="text-indigo-600 font-black">{estudiantesSeleccionados.length}</span>
+                    Seleccionados: <span className="text-red-600 font-black">{estudiantesSeleccionados.length}</span>
                   </span>
                   <button 
                     onClick={() => setEstudiantesSeleccionados([])}
@@ -245,7 +245,7 @@ export default function AsignarSimulacroModal({ simulacro, onSave, onCancel }) {
           </button>
           <button
             onClick={handleGuardar}
-            className="flex-1 py-4 bg-indigo-600 text-white rounded-2xl font-black hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 uppercase tracking-widest text-sm flex items-center justify-center gap-2"
+            className="flex-1 py-4 bg-red-600 text-white rounded-2xl font-black hover:bg-red-700 transition-all shadow-lg shadow-red-500/10 uppercase tracking-widest text-sm flex items-center justify-center gap-2"
           >
             Guardar Asignación
             <CheckCircle2 size={20} />

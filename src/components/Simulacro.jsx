@@ -103,7 +103,7 @@ export default function Simulacro({ drill, onFinish }) {
         </div>
         <div className="max-w-5xl mx-auto mt-4 h-1.5 bg-slate-100 rounded-full overflow-hidden">
           <div 
-            className="h-full bg-indigo-600 transition-all duration-300"
+            className="h-full bg-red-600 transition-all duration-300"
             style={{ width: `${((currentIdx + 1) / drillPreguntas.length) * 100}%` }}
           />
         </div>
@@ -120,7 +120,7 @@ export default function Simulacro({ drill, onFinish }) {
             className="bg-white p-8 md:p-12 rounded-3xl border border-slate-100 shadow-xl"
           >
             <div className="mb-8">
-              <span className="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-full text-xs font-bold uppercase tracking-wider mb-4 inline-block">
+              <span className="px-3 py-1 bg-red-50 text-red-600 rounded-full text-xs font-bold uppercase tracking-wider mb-4 inline-block">
                 {activePregunta.area}
               </span>
               <h3 className="text-xl md:text-2xl font-medium text-slate-800 leading-relaxed">
@@ -145,16 +145,16 @@ export default function Simulacro({ drill, onFinish }) {
                   onClick={() => handleSelect(key)}
                   className={`w-full p-6 text-left rounded-2xl border-2 transition-all flex items-center gap-4 group
                     ${respuestas[activePregunta.id] === key 
-                      ? 'border-indigo-600 bg-indigo-50 ring-4 ring-indigo-50' 
+                      ? 'border-red-600 bg-red-50 ring-4 ring-red-50' 
                       : 'border-slate-100 hover:border-slate-200 hover:bg-slate-50'}`}
                 >
                   <div className={`w-10 h-10 rounded-full border-2 flex items-center justify-center font-bold text-lg transition-all
                     ${respuestas[activePregunta.id] === key 
-                      ? 'bg-indigo-600 text-white border-indigo-600' 
+                      ? 'bg-red-600 text-white border-red-600' 
                       : 'bg-white text-slate-400 border-slate-200 group-hover:border-slate-800 group-hover:text-slate-800'}`}>
                     {key}
                   </div>
-                  <span className={`text-lg transition-all ${respuestas[activePregunta.id] === key ? 'text-indigo-900 font-medium' : 'text-slate-600'}`}>
+                  <span className={`text-lg transition-all ${respuestas[activePregunta.id] === key ? 'text-red-900 font-medium' : 'text-slate-600'}`}>
                     {valor}
                   </span>
                 </button>
@@ -175,7 +175,7 @@ export default function Simulacro({ drill, onFinish }) {
           <button 
             disabled={currentIdx === drillPreguntas.length - 1}
             onClick={() => setCurrentIdx(prev => prev + 1)}
-            className="flex items-center gap-2 px-6 py-3 font-bold text-indigo-600 hover:text-indigo-800 disabled:opacity-30 transition-all font-sans uppercase tracking-widest text-sm"
+            className="flex items-center gap-2 px-6 py-3 font-bold text-red-600 hover:text-red-800 disabled:opacity-30 transition-all font-sans uppercase tracking-widest text-sm"
           >
             Siguiente <ChevronRight size={20} />
           </button>

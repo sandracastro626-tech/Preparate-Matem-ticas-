@@ -50,9 +50,9 @@ export function TablaUsuarios({
       case 'ADMINISTRADOR': 
         return <span className="px-2 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-bold ring-1 ring-purple-200">ADMIN</span>;
       case 'DOCENTE': 
-        return <span className="px-2 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-bold ring-1 ring-indigo-200">DOCENTE</span>;
+        return <span className="px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs font-bold ring-1 ring-red-200">DOCENTE</span>;
       case 'ESTUDIANTE': 
-        return <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-bold ring-1 ring-blue-200">ESTUDIANTE</span>;
+        return <span className="px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs font-bold ring-1 ring-red-200">ESTUDIANTE</span>;
       default: return null;
     }
   };
@@ -66,7 +66,7 @@ export function TablaUsuarios({
           <input 
             type="text"
             placeholder="Buscar por nombre, correo, documento..."
-            className="w-full pl-10 pr-4 py-2 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 bg-white outline-none"
+            className="w-full pl-10 pr-4 py-2 rounded-xl border border-gray-200 focus:ring-2 focus:ring-red-500 bg-white outline-none"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -74,7 +74,7 @@ export function TablaUsuarios({
         
         <div className="flex flex-wrap gap-2 w-full md:w-auto">
           <select 
-            className="px-3 py-2 rounded-xl border border-gray-200 bg-white text-sm outline-none focus:ring-2 focus:ring-indigo-500"
+            className="px-3 py-2 rounded-xl border border-gray-200 bg-white text-sm outline-none focus:ring-2 focus:ring-red-500"
             value={filterRol}
             onChange={(e) => setFilterRol(e.target.value)}
           >
@@ -85,7 +85,7 @@ export function TablaUsuarios({
           </select>
           
           <select 
-            className="px-3 py-2 rounded-xl border border-gray-200 bg-white text-sm outline-none focus:ring-2 focus:ring-indigo-500"
+            className="px-3 py-2 rounded-xl border border-gray-200 bg-white text-sm outline-none focus:ring-2 focus:ring-red-500"
             value={filterEstado}
             onChange={(e) => setFilterEstado(e.target.value)}
           >
@@ -95,7 +95,7 @@ export function TablaUsuarios({
           </select>
 
           <select 
-            className="px-3 py-2 rounded-xl border border-gray-200 bg-white text-sm outline-none focus:ring-2 focus:ring-indigo-500"
+            className="px-3 py-2 rounded-xl border border-gray-200 bg-white text-sm outline-none focus:ring-2 focus:ring-red-500"
             value={filterGrupo}
             onChange={(e) => setFilterGrupo(e.target.value)}
           >
@@ -126,7 +126,7 @@ export function TablaUsuarios({
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-3">
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold
-                      ${(u.rol === 'ADMIN' || u.rol === 'administrador') ? 'bg-purple-500' : (u.rol === 'DOCENTE' || u.rol === 'docente') ? 'bg-indigo-500' : 'bg-blue-500'}`}>
+                      ${(u.rol === 'ADMIN' || u.rol === 'administrador') ? 'bg-red-600' : (u.rol === 'DOCENTE' || u.rol === 'docente') ? 'bg-red-500' : 'bg-red-400'}`}>
                       {u.nombreCompleto?.charAt(0)}
                     </div>
                     <div>
@@ -144,7 +144,7 @@ export function TablaUsuarios({
                 </td>
                 <td className="px-6 py-4 text-sm">
                   <div className="text-gray-700 truncate max-w-[150px]">{u.institucion}</div>
-                  <div className="text-xs font-bold text-indigo-600">{u.grupo || (u.gruposAsignados ? u.gruposAsignados.join(', ') : '')}</div>
+                  <div className="text-xs font-bold text-red-600">{u.grupo || (u.gruposAsignados ? u.gruposAsignados.join(', ') : '')}</div>
                 </td>
                 <td className="px-6 py-4 text-center">
                   <button 
@@ -162,7 +162,7 @@ export function TablaUsuarios({
                   <div className="flex items-center justify-end gap-1">
                     <button 
                       onClick={() => onView(u)}
-                      className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                      className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                       title="Ver detalles"
                     >
                       <Eye size={18} />
@@ -170,7 +170,7 @@ export function TablaUsuarios({
                     {u.rol === 'estudiante' && (
                       <button 
                         onClick={() => onAssignTeacher(u)}
-                        className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                        className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                         title="Asignar Docente"
                       >
                         <Shield size={18} />
@@ -233,8 +233,8 @@ export function TablaUsuarios({
                   onClick={() => setCurrentPage(i + 1)}
                   className={`w-10 h-10 rounded-lg text-sm font-bold transition-all
                     ${currentPage === i + 1 
-                      ? 'bg-indigo-600 text-white shadow-md' 
-                      : 'border border-gray-200 bg-white text-gray-600 hover:border-indigo-300'}`}
+                      ? 'bg-red-600 text-white shadow-md' 
+                      : 'border border-gray-200 bg-white text-gray-600 hover:border-red-300'}`}
                 >
                   {i + 1}
                 </button>

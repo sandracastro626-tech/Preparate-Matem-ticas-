@@ -25,7 +25,7 @@ export default function Result({ result, onBack }) {
     <div className="min-h-screen bg-slate-50 pb-20">
       <header className="bg-white border-b border-slate-100 p-6 sticky top-0 z-10 shadow-sm">
         <div className="max-w-6xl mx-auto flex items-center justify-between font-sans">
-          <button onClick={onBack} className="flex items-center gap-2 text-slate-500 hover:text-indigo-600 font-black transition-all text-sm uppercase tracking-widest">
+          <button onClick={onBack} className="flex items-center gap-2 text-slate-500 hover:text-red-600 font-black transition-all text-sm uppercase tracking-widest">
             <ArrowLeft size={20} /> Volver al Inicio
           </button>
           <div className="text-center">
@@ -33,7 +33,7 @@ export default function Result({ result, onBack }) {
              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Modelo Saber 11° - Icfes</p>
           </div>
           <div className="flex gap-4">
-             <button className="px-6 py-3 bg-indigo-600 text-white rounded-2xl text-xs font-black shadow-lg shadow-indigo-100 flex items-center gap-2 hover:bg-indigo-700 transition-all uppercase tracking-widest">
+             <button className="px-6 py-3 bg-red-600 text-white rounded-2xl text-xs font-black shadow-lg shadow-red-100 flex items-center gap-2 hover:bg-red-700 transition-all uppercase tracking-widest">
                <FileText size={18} /> Exportar
              </button>
           </div>
@@ -43,7 +43,7 @@ export default function Result({ result, onBack }) {
       <main className="max-w-5xl mx-auto p-6 mt-10 space-y-12">
         
         {/* ICFES Header Style Card */}
-        <section className="bg-white rounded-[3rem] overflow-hidden border border-slate-100 shadow-2xl shadow-indigo-100/20">
+        <section className="bg-white rounded-[3rem] overflow-hidden border border-slate-100 shadow-2xl shadow-red-100/20">
           <div className="grid grid-cols-1 md:grid-cols-3">
             <div className={`p-12 flex flex-col items-center justify-center text-center ${result.nivel.bg} border-r border-slate-50`}>
                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4">Puntaje Global</p>
@@ -59,7 +59,7 @@ export default function Result({ result, onBack }) {
             <div className="md:col-span-2 p-12 space-y-8 flex flex-col justify-center">
               <div>
                 <h3 className="text-xl font-black text-slate-800 mb-4 flex items-center gap-3">
-                  <div className="p-2 bg-indigo-50 text-indigo-600 rounded-xl">
+                  <div className="p-2 bg-red-50 text-red-600 rounded-xl">
                     <Trophy size={20} />
                   </div>
                   Interpretación del Resultado
@@ -76,7 +76,7 @@ export default function Result({ result, onBack }) {
                  </div>
                  <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Efectividad</p>
-                    <p className="text-xl font-black text-indigo-600">{Math.round((result.correctas / result.total) * 100)}%</p>
+                    <p className="text-xl font-black text-red-600">{Math.round((result.correctas / result.total) * 100)}%</p>
                  </div>
               </div>
             </div>
@@ -106,7 +106,7 @@ export default function Result({ result, onBack }) {
               </h3>
               <div className="space-y-4">
                 {recomendaciones.map((rec, i) => (
-                  <div key={i} className="p-5 bg-slate-50 border-l-4 border-indigo-600 rounded-2xl text-slate-700 font-bold text-sm leading-relaxed">
+                  <div key={i} className="p-5 bg-slate-50 border-l-4 border-red-600 rounded-2xl text-slate-700 font-bold text-sm leading-relaxed">
                     {rec}
                   </div>
                 ))}
@@ -162,15 +162,15 @@ export default function Result({ result, onBack }) {
 
                     <div className="bg-slate-900 p-8 rounded-[2rem] text-white overflow-hidden relative">
                       <div className="relative z-10">
-                        <h4 className="font-black text-indigo-400 flex items-center gap-2 mb-4 uppercase text-[10px] tracking-widest">
+                        <h4 className="font-black text-red-400 flex items-center gap-2 mb-4 uppercase text-[10px] tracking-widest">
                            <AlertCircle size={16} /> Retroalimentación
                         </h4>
-                        <p className="text-indigo-50 font-bold leading-relaxed mb-6 italic">
+                        <p className="text-red-50 font-bold leading-relaxed mb-6 italic">
                           {p.esCorrecta ? p.retroalimentacionCorrecta : p.retroalimentacionIncorrecta}
                         </p>
                         <div className="pt-6 border-t border-white/10">
                           <p className="text-xs text-slate-400 font-medium flex items-start gap-2">
-                            <span className="text-indigo-400 font-black">Análisis técnico:</span> {p.explicacion}
+                            <span className="text-red-400 font-black">Análisis técnico:</span> {p.explicacion}
                           </p>
                         </div>
                       </div>

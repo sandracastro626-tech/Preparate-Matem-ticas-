@@ -94,7 +94,7 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
         <div className="flex flex-col gap-4">
           <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-2">Usuario</p>
           <div className="flex items-center gap-3 p-4 bg-white/5 rounded-[2rem] border border-white/5 shadow-inner">
-            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black text-white shadow-lg ${rol === 'administrador' ? 'bg-indigo-600' : rol === 'docente' ? 'bg-emerald-600' : 'bg-red-600'}`}>
+            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black text-white shadow-lg ${rol === 'administrador' ? 'bg-red-700' : rol === 'docente' ? 'bg-red-600' : 'bg-red-500'}`}>
               {user?.nombreCompleto?.charAt(0)}
             </div>
             <div className="overflow-hidden">

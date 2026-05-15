@@ -74,7 +74,7 @@ export default function InicioEstudiante({ user, resultados }) {
           <div className="relative z-10">
             <h2 className="text-3xl font-black mb-2 tracking-tight">¡Hola, {user.nombreCompleto.split(' ')[0]}!</h2>
             <p className="text-slate-400 font-medium max-w-xs leading-relaxed">
-              Tu desempeño actual en Matemáticas es de nivel <span className="text-indigo-400 font-black">{stats.ultimo.nivel?.label || 'Básico'}</span>.
+              Tu desempeño actual en Matemáticas es de nivel <span className="text-red-400 font-black">{stats.ultimo.nivel?.label || 'Básico'}</span>.
             </p>
           </div>
           <div className="flex gap-4 mt-8 relative z-10">
@@ -116,14 +116,14 @@ export default function InicioEstudiante({ user, resultados }) {
           <div className="flex items-center justify-between mb-10">
             <div>
               <h3 className="text-xl font-black text-slate-800 flex items-center gap-3">
-                <Brain className="text-indigo-600" size={24} />
+                <Brain className="text-red-600" size={24} />
                 Desempeño por Competencias
               </h3>
               <p className="text-sm text-slate-400 font-medium mt-1">Análisis de habilidades matemáticas</p>
             </div>
             <div className="flex gap-4">
               <div className="text-right">
-                <p className="text-[10px] font-black text-indigo-600 uppercase tracking-widest">{stats.fuerteComp[0]}</p>
+                <p className="text-[10px] font-black text-red-600 uppercase tracking-widest">{stats.fuerteComp[0]}</p>
                 <p className="text-xs text-slate-400 font-bold">Fortaleza Principal</p>
               </div>
             </div>
@@ -148,7 +148,7 @@ export default function InicioEstudiante({ user, resultados }) {
                 />
                 <Bar dataKey="value" radius={[0, 10, 10, 0]} barSize={24}>
                   {dataCompetencias.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={index === 0 ? '#6366f1' : index === 1 ? '#8b5cf6' : '#ec4899'} />
+                    <Cell key={`cell-${index}`} fill={index === 0 ? '#ef4444' : index === 1 ? '#dc2626' : '#b91c1c'} />
                   ))}
                 </Bar>
               </BarChart>
@@ -192,17 +192,17 @@ export default function InicioEstudiante({ user, resultados }) {
 
       {/* Fortalezas y Retroalimentación Breve */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 bg-indigo-50 p-10 rounded-[2.5rem] border border-indigo-100">
-          <h3 className="text-xl font-black text-indigo-900 mb-6 flex items-center gap-3">
-            <TrendingUp className="text-indigo-600" />
+        <div className="lg:col-span-2 bg-red-50 p-10 rounded-[2.5rem] border border-red-100">
+          <h3 className="text-xl font-black text-red-900 mb-6 flex items-center gap-3">
+            <TrendingUp className="text-red-600" />
             Retroalimentación Automática
           </h3>
-          <p className="text-indigo-900/70 font-medium leading-relaxed">
-            Tu competencia más fuerte es <span className="font-black text-indigo-950">{stats.fuerteComp[0]}</span> ({stats.fuerteComp[1]}%), lo que indica que {stats.fuerteComp[0] === 'Interpretación y representación' ? 'comprendes de manera excelente la información presentada en diversos formatos.' : stats.fuerteComp[0] === 'Formulación y ejecución' ? 'puedes aplicar procedimientos matemáticos para resolver problemas de manera efectiva.' : 'tienes una gran capacidad para validar afirmaciones y justificar rutas de solución.'}
+          <p className="text-red-900/70 font-medium leading-relaxed">
+            Tu competencia más fuerte es <span className="font-black text-red-950">{stats.fuerteComp[0]}</span> ({stats.fuerteComp[1]}%), lo que indica que {stats.fuerteComp[0] === 'Interpretación y representación' ? 'comprendes de manera excelente la información presentada en diversos formatos.' : stats.fuerteComp[0] === 'Formulación y ejecución' ? 'puedes aplicar procedimientos matemáticos para resolver problemas de manera efectiva.' : 'tienes una gran capacidad para validar afirmaciones y justificar rutas de solución.'}
           </p>
-          <div className="h-px bg-indigo-200 my-6" />
-          <p className="text-indigo-900/70 font-medium leading-relaxed">
-            La competencia que más debes reforzar es <span className="font-black text-indigo-950">{stats.debilComp[0]}</span>. Se recomienda practicar ejercicios donde debas {stats.debilComp[0] === 'Interpretación y representación' ? 'identificar datos relevantes y transformar información gráfica a tabular.' : stats.debilComp[0] === 'Formulación y ejecución' ? 'plantear estrategias de solución y verificar procedimientos paso a paso.' : 'explicar por qué una respuesta es correcta o incorrecta y validar afirmaciones lógicas.'}
+          <div className="h-px bg-red-200 my-6" />
+          <p className="text-red-900/70 font-medium leading-relaxed">
+            La competencia que más debes reforzar es <span className="font-black text-red-950">{stats.debilComp[0]}</span>. Se recomienda practicar ejercicios donde debas {stats.debilComp[0] === 'Interpretación y representación' ? 'identificar datos relevantes y transformar información gráfica a tabular.' : stats.debilComp[0] === 'Formulación y ejecución' ? 'plantear estrategias de solución y verificar procedimientos paso a paso.' : 'explicar por qué una respuesta es correcta o incorrecta y validar afirmaciones lógicas.'}
           </p>
         </div>
 
@@ -219,8 +219,8 @@ export default function InicioEstudiante({ user, resultados }) {
             <SummaryItem 
               label="Competencia Clave" 
               value={stats.fuerteComp[0]} 
-              color="text-indigo-600" 
-              bg="bg-indigo-50" 
+              color="text-red-600" 
+              bg="bg-red-50" 
               icon={Brain}
             />
             <SummaryItem 
