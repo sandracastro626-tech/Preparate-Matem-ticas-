@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   X, User, GraduationCap, Building2, Mail, Calendar, 
@@ -51,16 +51,25 @@ export default function AnalisisEstudiante({ estudiante, intentos, onBack }) {
 
   const nivel = ultimoResultado ? getPerformanceLevel(ultimoResultado.resultados?.puntajeGlobal || 0) : { label: 'N/A', color: 'text-slate-400', bg: 'bg-slate-50' };
 
-  // Mock data for charts if no results
-  const radarData = ultimoResultado ? Object.entries(ultimoResultado.resultados?.competencias || {}).map(([key, value]) => ({
-    subject: key.split(' ')[0],
-    value,
-    fullMark: 100
-  })) : [
-    { subject: 'Interp.', value: 0, fullMark: 100 },
-    { subject: 'Formul.', value: 0, fullMark: 100 },
-    { subject: 'Argum.', value: 0, fullMark: 100 },
-  ];
+  // Data for charts
+  const radarData = useMemo(() => {
+    const base = [
+      { subject: 'Interpretación', rawKey: 'Interpretación y representación' },
+      { subject: 'Formulación', rawKey: 'Formulación y ejecución' },
+      { subject: 'Argumentación', rawKey: 'Argumentación' }
+    ];
+    
+    if (!ultimoResultado) {
+      return base.map(b => ({ subject: b.subject, value: 0, fullMark: 100 }));
+    }
+
+    const comps = ultimoResultado.resultados?.competencias || {};
+    return base.map(b => ({
+      subject: b.subject,
+      value: comps[b.rawKey] ?? comps[b.subject] ?? 0,
+      fullMark: 100
+    }));
+  }, [ultimoResultado]);
 
   const barData = misResultados.map(r => ({
     name: r.fecha || 'Simulacro',

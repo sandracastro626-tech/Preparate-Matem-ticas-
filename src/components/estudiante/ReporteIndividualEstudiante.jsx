@@ -22,10 +22,16 @@ export default function ReporteIndividualEstudiante({ user, resultados }) {
     const ultimo = resultados[0];
 
     // Promedios por competencia
-    const comps = {};
+    const comps = {
+      "Interpretación y representación": 0,
+      "Formulación y ejecución": 0,
+      "Argumentación": 0
+    };
     resultados.forEach(r => {
-      Object.entries(r.competencias).forEach(([k,v]) => {
-        comps[k] = (comps[k] || 0) + v;
+      Object.entries(r.competencias || {}).forEach(([k,v]) => {
+        if (comps.hasOwnProperty(k)) {
+          comps[k] += v;
+        }
       });
     });
     Object.keys(comps).forEach(k => comps[k] = Math.round(comps[k] / count));
@@ -52,7 +58,17 @@ export default function ReporteIndividualEstudiante({ user, resultados }) {
       promedioGeneral,
       mejor,
       ultimo,
-      competencias: Object.entries(comps).map(([name, value]) => ({ name, value })),
+      competencias: (() => {
+        const base = [
+          { name: "Interpretación", rawKey: "Interpretación y representación" },
+          { name: "Formulación", rawKey: "Formulación y ejecución" },
+          { name: "Argumentación", rawKey: "Argumentación" }
+        ];
+        return base.map(item => ({
+          name: item.name,
+          value: comps[item.rawKey] ?? comps[item.name] ?? 0
+        }));
+      })(),
       componentes: Object.entries(components).map(([name, value]) => ({ name, value })),
       fuerteComp,
       debilComp,

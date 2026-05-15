@@ -72,35 +72,47 @@ export function AppProvider({ children }) {
   });
   const [usuarios, setUsuarios] = useState(() => {
     const saved = localStorage.getItem(STORAGE_KEYS.usuarios);
-    const inicializada = localStorage.getItem('plataformaInicializadaParaUsoReal');
-    if (!saved && inicializada === 'true') return [];
-    const initial = saved ? JSON.parse(saved) : USUARIOS_INICIALES;
-    return initial.map(normalizarUsuario);
+    return saved ? JSON.parse(saved).map(normalizarUsuario) : [];
   });
+
+  const inicializarAdministradorPrincipal = () => {
+    const saved = localStorage.getItem(STORAGE_KEYS.usuarios);
+    const usuariosGuardados = saved ? JSON.parse(saved) : [];
+
+    if (!Array.isArray(usuariosGuardados) || usuariosGuardados.length === 0) {
+      const administradorPrincipal = {
+        id: "admin_001",
+        rol: "administrador",
+        nombreCompleto: "Administrador del Sistema",
+        correo: "admin@checkicfes.com",
+        usuario: "admin",
+        contrasena: "Admin123*",
+        estado: "activo",
+        esPrincipal: true,
+        institucion: "CHECK-ICFES",
+        debeCambiarContrasena: false,
+        fechaCreacion: new Date().toISOString()
+      };
+
+      const initial = [administradorPrincipal];
+      localStorage.setItem(STORAGE_KEYS.usuarios, JSON.stringify(initial));
+      localStorage.setItem("adminInicialCreado", "true");
+      setUsuarios(initial.map(normalizarUsuario));
+      console.log("Administrador principal creado correctamente.");
+    }
+  };
+
+  useEffect(() => {
+    inicializarAdministradorPrincipal();
+  }, []);
   const [preguntas, setPreguntas] = useState(() => {
     const saved = localStorage.getItem(STORAGE_KEYS.preguntas);
-    const inicializada = localStorage.getItem('plataformaInicializadaParaUsoReal');
-    if (!saved && inicializada === 'true') return [];
     return saved ? JSON.parse(saved) : PREGUNTAS_INICIALES;
   });
   const [simulacros, setSimulacros] = useState(() => {
     const saved = localStorage.getItem(STORAGE_KEYS.simulacros);
-    const inicializada = localStorage.getItem('plataformaInicializadaParaUsoReal');
-    if (!saved && inicializada === 'true') return [];
     return saved ? JSON.parse(saved) : SIMULACROS_INICIALES;
   });
-
-  // Migración inicial
-  useEffect(() => {
-    const inicializada = localStorage.getItem('plataformaInicializadaParaUsoReal');
-    if (inicializada !== 'true') {
-      migrarDatosAntiguosAGlobales();
-      const result = normalizarPreguntasGlobales();
-      if (result && result.length > 0) {
-        setPreguntas(result);
-      }
-    }
-  }, []);
 
   // Sync state between tabs
   useEffect(() => {
@@ -209,27 +221,22 @@ export function AppProvider({ children }) {
     const identificador = normalizarTexto(usuarioOCorreo);
     const claveIngresada = String(contrasenaIngresada || "").trim();
 
-    console.log("=== DEPURACIÓN LOGIN DOCENTE ===");
-    console.log("Identificador ingresado:", identificador);
-    console.log("Contraseña ingresada (longitud):", claveIngresada.length);
-    
     if (!identificador || !claveIngresada) {
-      return { success: false, message: "Ingrese usuario, correo, código o documento y contraseña." };
+      return { success: false, message: "Ingrese usuario o correo y contraseña." };
     }
 
-    const usuariosNormalizados = usuarios.map(normalizarUsuario);
-    console.log("Total usuarios registrados:", usuariosNormalizados.length);
+    const usuariosActuales = JSON.parse(localStorage.getItem(STORAGE_KEYS.usuarios)) || usuarios;
+    const usuariosNormalizados = usuariosActuales.map(normalizarUsuario);
 
     const usuarioEncontrado = usuariosNormalizados.find((u) => {
       return (
         normalizarTexto(u.email) === identificador ||
+        normalizarTexto(u.correo) === identificador ||
         normalizarTexto(u.usuario) === identificador ||
         normalizarTexto(u.codigoEstudiante) === identificador ||
         normalizarTexto(u.numeroDocumento) === identificador
       );
     });
-
-    console.log("Usuario encontrado:", usuarioEncontrado);
 
     if (!usuarioEncontrado) {
       return { success: false, message: "Usuario o contraseña incorrecta." };
@@ -244,8 +251,6 @@ export function AppProvider({ children }) {
       return { success: false, message: "Usuario o contraseña incorrecta." };
     }
 
-    const rol = usuarioEncontrado.rol;
-    
     localStorage.setItem('usuarioActual', JSON.stringify(usuarioEncontrado));
     localStorage.setItem('sesionActiva', 'true');
     setUser(usuarioEncontrado);

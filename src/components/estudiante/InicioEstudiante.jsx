@@ -25,8 +25,14 @@ export default function InicioEstudiante({ user, resultados }) {
     const count = resultados.length;
     
     // Calcular competencia más fuerte y por reforzar del último resultado
-    const comps = ultimo.competencias;
-    const sortedComps = Object.entries(comps).sort(([,a], [,b]) => b - a);
+    const rawComps = ultimo.competencias || {};
+    const normalizedComps = {
+      'Interpretación y representación': rawComps['Interpretación y representación'] || 0,
+      'Formulación y ejecución': rawComps['Formulación y ejecución'] || 0,
+      'Argumentación': rawComps['Argumentación'] || 0
+    };
+    
+    const sortedComps = Object.entries(normalizedComps).sort(([,a], [,b]) => b - a);
     const fuerteComp = sortedComps[0];
     const debilComp = sortedComps[sortedComps.length - 1];
 
@@ -48,7 +54,19 @@ export default function InicioEstudiante({ user, resultados }) {
 
   const dataCompetencias = useMemo(() => {
     if (!stats) return [];
-    return Object.entries(stats.ultimo.competencias).map(([name, value]) => ({ name, value }));
+    
+    const base = [
+      { name: "Interpretación", rawKey: "Interpretación y representación" },
+      { name: "Formulación", rawKey: "Formulación y ejecución" },
+      { name: "Argumentación", rawKey: "Argumentación" }
+    ];
+
+    const currentComps = stats.ultimo.competencias || {};
+    
+    return base.map(item => ({
+      name: item.name,
+      value: currentComps[item.rawKey] ?? currentComps[item.name] ?? 0
+    }));
   }, [stats]);
 
   const dataComponentes = useMemo(() => {
@@ -198,11 +216,11 @@ export default function InicioEstudiante({ user, resultados }) {
             Retroalimentación Automática
           </h3>
           <p className="text-red-900/70 font-medium leading-relaxed">
-            Tu competencia más fuerte es <span className="font-black text-red-950">{stats.fuerteComp[0]}</span> ({stats.fuerteComp[1]}%), lo que indica que {stats.fuerteComp[0] === 'Interpretación y representación' ? 'comprendes de manera excelente la información presentada en diversos formatos.' : stats.fuerteComp[0] === 'Formulación y ejecución' ? 'puedes aplicar procedimientos matemáticos para resolver problemas de manera efectiva.' : 'tienes una gran capacidad para validar afirmaciones y justificar rutas de solución.'}
+            Tu competencia más fuerte es <span className="font-black text-red-950">{stats.fuerteComp[0]}</span> ({stats.fuerteComp[1]}%), lo que indica que {stats.fuerteComp[0]?.includes('Interpretación') ? 'comprendes de manera excelente la información presentada en diversos formatos.' : stats.fuerteComp[0]?.includes('Formulación') ? 'puedes aplicar procedimientos matemáticos para resolver problemas de manera efectiva.' : 'tienes una gran capacidad para validar afirmaciones y justificar rutas de solución.'}
           </p>
           <div className="h-px bg-red-200 my-6" />
           <p className="text-red-900/70 font-medium leading-relaxed">
-            La competencia que más debes reforzar es <span className="font-black text-red-950">{stats.debilComp[0]}</span>. Se recomienda practicar ejercicios donde debas {stats.debilComp[0] === 'Interpretación y representación' ? 'identificar datos relevantes y transformar información gráfica a tabular.' : stats.debilComp[0] === 'Formulación y ejecución' ? 'plantear estrategias de solución y verificar procedimientos paso a paso.' : 'explicar por qué una respuesta es correcta o incorrecta y validar afirmaciones lógicas.'}
+            La competencia que más debes reforzar es <span className="font-black text-red-950">{stats.debilComp[0]}</span>. Se recomienda practicar ejercicios donde debas {stats.debilComp[0]?.includes('Interpretación') ? 'identificar datos relevantes y transformar información gráfica a tabular.' : stats.debilComp[0]?.includes('Formulación') ? 'plantear estrategias de solución y verificar procedimientos paso a paso.' : 'explicar por qué una respuesta es correcta o incorrecta y validar afirmaciones lógicas.'}
           </p>
         </div>
 

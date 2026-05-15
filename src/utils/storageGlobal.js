@@ -134,7 +134,7 @@ export const limpiarDatosDePrueba = () => {
     contrasena: "Admin123*",
     estado: "activo",
     esPrincipal: true,
-    institucion: "CHECKICFES HQ",
+    institucion: "CHECK-ICFES",
     debeCambiarContrasena: false,
     fechaCreacion: new Date().toISOString()
   };

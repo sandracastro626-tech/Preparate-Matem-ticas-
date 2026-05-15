@@ -17,7 +17,17 @@ export default function DetalleResultadoEstudiante({ resultado, onBack }) {
     totalPreguntas, competencias, componentes, respuestas, nivel 
   } = resultado;
 
-  const dataCompetencias = Object.entries(competencias).map(([name, value]) => ({ name, value }));
+  const dataCompetencias = (() => {
+    const base = [
+      { name: "Interpretación", rawKey: "Interpretación y representación" },
+      { name: "Formulación", rawKey: "Formulación y ejecución" },
+      { name: "Argumentación", rawKey: "Argumentación" }
+    ];
+    return base.map(item => ({
+      name: item.name,
+      value: competencias[item.rawKey] ?? competencias[item.name] ?? 0
+    }));
+  })();
   const dataComponentes = Object.entries(componentes).map(([name, value]) => ({ name, value }));
   const dataPie = [
     { name: 'Correctas', value: correctas, color: '#10b981' },

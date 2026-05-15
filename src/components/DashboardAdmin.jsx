@@ -113,11 +113,14 @@ export default function AdminDashboard() {
                     </h3>
                   </div>
                   <div className="h-[300px]">
-                    <BarDesempeño data={[
-                      { name: 'Interpretación', porcentaje: 55 },
-                      { name: 'Formulación', porcentaje: 62 },
-                      { name: 'Argumentación', porcentaje: 48 },
-                    ]} />
+                    <BarDesempeño 
+                      dataKey="porcentaje"
+                      data={[
+                        { name: 'Interpretación', porcentaje: 55 },
+                        { name: 'Formulación', porcentaje: 62 },
+                        { name: 'Argumentación', porcentaje: 48 },
+                      ]} 
+                    />
                   </div>
                   <p className="mt-6 text-sm text-slate-400 font-medium text-center">
                     La competencia de <span className="font-black text-slate-600">Argumentación</span> requiere refuerzo prioritario.
