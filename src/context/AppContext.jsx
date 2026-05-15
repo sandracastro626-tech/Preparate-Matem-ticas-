@@ -71,47 +71,73 @@ export function AppProvider({ children }) {
     return (sesionActiva === 'true' && saved) ? normalizarUsuario(JSON.parse(saved)) : null;
   });
   const [usuarios, setUsuarios] = useState(() => {
-    const saved = localStorage.getItem(STORAGE_KEYS.usuarios);
-    return saved ? JSON.parse(saved).map(normalizarUsuario) : [];
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS.usuarios);
+      if (!saved) return [];
+      const parsed = JSON.parse(saved);
+      return Array.isArray(parsed) ? parsed.map(normalizarUsuario) : [];
+    } catch (e) {
+      console.error("Error reading users from storage:", e);
+      return [];
+    }
   });
 
   const inicializarAdministradorPrincipal = () => {
-    const saved = localStorage.getItem(STORAGE_KEYS.usuarios);
-    const usuariosGuardados = saved ? JSON.parse(saved) : [];
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS.usuarios);
+      let usuariosGuardados = [];
+      try {
+        usuariosGuardados = saved ? JSON.parse(saved) : [];
+      } catch (e) {
+        usuariosGuardados = [];
+      }
 
-    if (!Array.isArray(usuariosGuardados) || usuariosGuardados.length === 0) {
-      const administradorPrincipal = {
-        id: "admin_001",
-        rol: "administrador",
-        nombreCompleto: "Administrador del Sistema",
-        correo: "admin@checkicfes.com",
-        usuario: "admin",
-        contrasena: "Admin123*",
-        estado: "activo",
-        esPrincipal: true,
-        institucion: "CHECK-ICFES",
-        debeCambiarContrasena: false,
-        fechaCreacion: new Date().toISOString()
-      };
+      if (!Array.isArray(usuariosGuardados) || usuariosGuardados.length === 0) {
+        const administradorPrincipal = {
+          id: "admin_001",
+          rol: "administrador",
+          nombreCompleto: "Administrador del Sistema",
+          correo: "admin@checkicfes.com",
+          usuario: "admin",
+          contrasena: "Admin123*",
+          estado: "activo",
+          esPrincipal: true,
+          institucion: "CHECK-ICFES",
+          debeCambiarContrasena: false,
+          fechaCreacion: new Date().toISOString()
+        };
 
-      const initial = [administradorPrincipal];
-      localStorage.setItem(STORAGE_KEYS.usuarios, JSON.stringify(initial));
-      localStorage.setItem("adminInicialCreado", "true");
-      setUsuarios(initial.map(normalizarUsuario));
-      console.log("Administrador principal creado correctamente.");
+        const initial = [administradorPrincipal];
+        localStorage.setItem(STORAGE_KEYS.usuarios, JSON.stringify(initial));
+        localStorage.setItem("adminInicialCreado", "true");
+        setUsuarios(initial.map(normalizarUsuario));
+        console.log("Administrador principal creado correctamente.");
+      }
+    } catch (e) {
+      console.error("Critical error in inicializarAdministradorPrincipal:", e);
     }
   };
 
   useEffect(() => {
     inicializarAdministradorPrincipal();
   }, []);
+
   const [preguntas, setPreguntas] = useState(() => {
-    const saved = localStorage.getItem(STORAGE_KEYS.preguntas);
-    return saved ? JSON.parse(saved) : PREGUNTAS_INICIALES;
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS.preguntas);
+      return saved ? JSON.parse(saved) : PREGUNTAS_INICIALES;
+    } catch (e) {
+      return PREGUNTAS_INICIALES;
+    }
   });
+
   const [simulacros, setSimulacros] = useState(() => {
-    const saved = localStorage.getItem(STORAGE_KEYS.simulacros);
-    return saved ? JSON.parse(saved) : SIMULACROS_INICIALES;
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS.simulacros);
+      return saved ? JSON.parse(saved) : SIMULACROS_INICIALES;
+    } catch (e) {
+      return SIMULACROS_INICIALES;
+    }
   });
 
   // Sync state between tabs

@@ -5,7 +5,7 @@ import {
   ListChecks, GraduationCap, ChevronRight, BarChart3
 } from 'lucide-react';
 import { BarDesempeño, PieNiveles } from './Charts';
-import GestionUsuarios from './UserManagement/UserManagement';
+import GestionUsuarios from './UserManagement/GestionUsuarios';
 import BancoPreguntas from './admin/BancoPreguntas';
 import GestionSimulacros from './admin/GestionSimulacros';
 import Sidebar from './layout/Sidebar';
