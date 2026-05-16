@@ -81,22 +81,22 @@ service cloud.firestore {
     }
 
     match /preguntas/{preguntaId} {
-      allow read: if isSignedIn();
-      allow create: if (isAdmin() || isDocente()) && isValidPregunta(incoming());
-      allow update: if (isAdmin() || (isDocente() && existing().creadoPor == request.auth.uid)) && isValidPregunta(incoming());
-      allow delete: if isAdmin();
+      allow read: if isEmailVerified();
+      allow create: if isEmailVerified() && (isAdmin() || isDocente()) && isValidPregunta(incoming());
+      allow update: if isEmailVerified() && (isAdmin() || (isDocente() && existing().creadoPor == request.auth.uid)) && isValidPregunta(incoming());
+      allow delete: if isEmailVerified() && isAdmin();
     }
 
     match /simulacros/{simulacroId} {
-      allow read: if isSignedIn();
-      allow create: if (isAdmin() || isDocente());
-      allow update: if (isAdmin() || (isDocente() && existing().creadoPor == request.auth.uid));
-      allow delete: if isAdmin();
+      allow read: if isEmailVerified();
+      allow create: if isEmailVerified() && (isAdmin() || isDocente());
+      allow update: if isEmailVerified() && (isAdmin() || (isDocente() && existing().creadoPor == request.auth.uid));
+      allow delete: if isEmailVerified() && isAdmin();
     }
 
     match /intentos/{intentoId} {
-      allow read: if isSignedIn() && (isOwner(existing().estudianteId) || isAdmin() || isDocente());
-      allow create: if isSignedIn() && incoming().estudianteId == request.auth.uid;
+      allow read: if isEmailVerified() && (isOwner(existing().estudianteId) || isAdmin() || isDocente());
+      allow create: if isEmailVerified() && incoming().estudianteId == request.auth.uid;
       allow update, delete: if false; // Attempts are immutable
     }
 

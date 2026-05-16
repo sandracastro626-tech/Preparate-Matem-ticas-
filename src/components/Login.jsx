@@ -3,7 +3,7 @@ import { useApp } from '../context/AppContext';
 import { BookOpen, User, GraduationCap, ArrowRight, LogIn, AlertCircle, CheckCircle2 } from 'lucide-react';
 
 export default function Login() {
-  const { login, loginWithGoogle, registerUser } = useApp();
+  const { login, registerUser } = useApp();
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -23,21 +23,6 @@ export default function Login() {
       }
     } catch (err) {
       setError("Error al iniciar sesión. Intente de nuevo.");
-      setIsLoading(false);
-    }
-  };
-
-  const handleGoogleLogin = async () => {
-    setIsLoading(true);
-    setError('');
-    try {
-      const res = await loginWithGoogle();
-      if (!res.success) {
-        setError(res.message);
-      }
-    } catch (err) {
-      setError("Error con Google login: " + err.message);
-    } finally {
       setIsLoading(false);
     }
   };
@@ -156,25 +141,6 @@ export default function Login() {
             >
               {isLoading ? 'Verificando...' : 'Iniciar Sesión'}
               {!isLoading && <ArrowRight size={20} />}
-            </button>
-
-            <div className="relative my-8">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-slate-100"></div>
-              </div>
-              <div className="relative flex justify-center text-[10px] font-black uppercase tracking-widest">
-                <span className="bg-white px-4 text-slate-400">O ingresa con</span>
-              </div>
-            </div>
-
-            <button 
-              type="button"
-              onClick={handleGoogleLogin}
-              disabled={isLoading}
-              className="w-full py-5 bg-white border-2 border-slate-100 hover:border-blue-600 hover:bg-blue-50 text-slate-700 rounded-2xl font-black flex items-center justify-center gap-4 transition-all disabled:opacity-70 uppercase tracking-widest text-sm"
-            >
-              <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-6 h-6" />
-              Continuar con Google
             </button>
           </form>
 

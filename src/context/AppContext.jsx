@@ -16,8 +16,7 @@ import {
   signInWithEmailAndPassword, 
   signOut,
   createUserWithEmailAndPassword,
-  GoogleAuthProvider,
-  signInWithPopup
+  sendEmailVerification
 } from 'firebase/auth';
 import { 
   doc, 
@@ -256,6 +255,13 @@ export function AppProvider({ children }) {
       const email = usuarioOCorreo.includes('@') ? usuarioOCorreo : `${usuarioOCorreo}@checkicfes.com`;
       const res = await signInWithEmailAndPassword(auth, email, contrasenaIngresada);
       
+      if (!res.user.emailVerified) {
+        // Enviar recordatorio si no está verificado (opcional, pero ayuda al usuario)
+        // await sendEmailVerification(res.user); 
+        await signOut(auth);
+        return { success: false, message: "Por favor, verifica tu correo electrónico en tu bandeja de entrada antes de ingresar." };
+      }
+
       // Data will be set by onAuthStateChanged
       return { success: true };
     } catch (error) {
@@ -274,43 +280,6 @@ export function AppProvider({ children }) {
     }
   };
 
-  const loginWithGoogle = async () => {
-    try {
-      const provider = new GoogleAuthProvider();
-      const result = await signInWithPopup(auth, provider);
-      const firebaseUser = result.user;
-      
-      // Check if user exists in Firestore
-      const userDocRef = doc(db, 'users', firebaseUser.uid);
-      const userDoc = await getDoc(userDocRef);
-      
-      if (!userDoc.exists()) {
-        // Create initial profile for Google user
-        // We use sandraandersoncy@gmail.com as admin if specified by user request
-        const isAdminEmail = firebaseUser.email === 'sandraandersoncy@gmail.com' || firebaseUser.email === 'sandracastro626@gmail.com';
-        
-        const newUserProfile = normalizarUsuario({
-          id: firebaseUser.uid,
-          nombreCompleto: firebaseUser.displayName || "Usuario de Google",
-          email: firebaseUser.email,
-          usuario: firebaseUser.email.split('@')[0],
-          rol: isAdminEmail ? 'administrador' : 'estudiante',
-          estado: 'activo',
-          fechaCreacion: new Date().toISOString(),
-          fotoUrl: firebaseUser.photoURL
-        });
-        
-        await setDoc(userDocRef, newUserProfile);
-        setUser(newUserProfile);
-      }
-      
-      return { success: true };
-    } catch (error) {
-      console.error("Google login error:", error);
-      return { success: false, message: error.message };
-    }
-  };
-
   const logout = async () => {
     try {
       await signOut(auth);
@@ -321,35 +290,44 @@ export function AppProvider({ children }) {
 
   const registerUser = async (newUser) => {
     try {
-      // In a real app, you might want to prevent logout or use a separate function.
-      // For this task, we assume the admin is creating the account.
-      // Firebase standard SDK will sign in as the new user when creating them.
-      // This is a limitation. A better way for client-side demo is to just create firestore doc
-      // and assume they will sign up later, OR use a cloud function.
-      // BUT for simplicity, we'll try to use a mock for Auth and real Firestore if needed,
-      // OR just guide the user that they need to enable email/pass.
-      
       const email = newUser.email || `${newUser.usuario}@checkicfes.com`;
       const password = newUser.contrasena || 'Temp123*';
       
-      // Note: This will log out the current user (admin).
       const res = await createUserWithEmailAndPassword(auth, email, password);
       const uid = res.user.uid;
+
+      // Enviar correo de verificación inmediatamente
+      await sendEmailVerification(res.user);
       
       const userToSave = normalizarUsuario({
         ...newUser,
         email,
         id: uid,
         fechaCreacion: new Date().toISOString(),
-        estado: 'activo'
+        estado: 'activo',
+        emailVerified: false // Flag manual para seguimiento
       });
       
       await setDoc(doc(db, 'users', uid), userToSave);
       
-      return { success: true };
+      // Como createUserWithEmailAndPassword hace login automático, hacemos logout
+      // para obligar a verificar el correo primero.
+      await signOut(auth);
+
+      return { success: true, message: "Usuario creado. Se ha enviado un correo de verificación." };
     } catch (error) {
       console.error("Registration error:", error);
-      return { success: false, message: error.message };
+      let message = error.message;
+      if (error.code === 'auth/operation-not-allowed') {
+        message = "El registro con correo/contraseña no está habilitado en Firebase. Por favor, actívalo en la consola de Firebase (Sección Authentication -> Sign-in method).";
+      } else if (error.code === 'auth/email-already-in-use') {
+        message = "Este correo electrónico ya está en uso.";
+      } else if (error.code === 'auth/weak-password') {
+        message = "La contraseña es muy débil (mínimo 6 caracteres).";
+      } else if (error.code === 'auth/invalid-email') {
+        message = "El formato del correo electrónico es inválido.";
+      }
+      return { success: false, message };
     }
   };
 
@@ -696,7 +674,7 @@ export function AppProvider({ children }) {
 
   return (
     <AppContext.Provider value={{
-      user, login, loginWithGoogle, logout, registerUser,
+      user, login, logout, registerUser,
       usuarios, setUsuarios, updateUsuario, deleteUsuario, toggleUserStatus, resetPassword, changePassword, bulkImportUsers,
       asignarDocenteAEstudiante, asignarDocenteAGrupo,
       preguntas, addPregunta, deletePregunta, updatePregunta,
