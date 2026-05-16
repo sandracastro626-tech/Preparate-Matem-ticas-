@@ -1,6 +1,6 @@
 {
   "name": "CHECK-ICFES Matemáticas",
-  "description": "Plataforma enfocada en la preparación y seguimiento de la prueba ICFES Saber 11° en el área de Matemáticas.",
+  "description": "Plataforma avanzada de preparación para la prueba ICFES Saber 11° Matemáticas, con gestión de usuarios, banco de preguntas flexible y seguimiento en tiempo real.",
   "requestFramePermissions": [],
   "majorCapabilities": []
 }

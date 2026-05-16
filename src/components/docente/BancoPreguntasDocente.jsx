@@ -50,7 +50,9 @@ export default function BancoPreguntasDocente() {
                       p.origen === 'docente' ||
                       p.creadoPor === user.id;
 
-    const matchesSearch = p.enunciado.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    const matchesSearch = (p.enunciado || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
+                         (p.textoInicial || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (p.textoPosterior || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
                          p.competencia.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          p.autorNombre?.toLowerCase().includes(searchTerm.toLowerCase());
     
@@ -167,12 +169,17 @@ export default function BancoPreguntasDocente() {
                       <ImageIcon size={10} /> Imagen
                     </span>
                   )}
+                  {p.textoPosterior && (
+                    <span className="flex items-center gap-1 text-[8px] text-indigo-600 font-black uppercase tracking-widest bg-indigo-50 px-2 py-0.5 rounded-md">
+                      <BookOpen size={10} /> Posterior
+                    </span>
+                  )}
                   <span className="text-[10px] font-black text-slate-300">ID: {p.id}</span>
                 </div>
               </div>
               
               <p className="text-sm font-bold text-slate-700 mb-6 flex-1 line-clamp-4 leading-relaxed group-hover:text-indigo-600 transition-colors">
-                {p.enunciado}
+                {p.textoInicial || p.enunciado}
               </p>
 
               <div className="space-y-4 pt-6 border-t border-slate-50">

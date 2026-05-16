@@ -42,7 +42,9 @@ export default function BancoPreguntas() {
   const filteredPreguntas = preguntas.filter(p => {
     const estado = String(p.estado || "activa").toLowerCase();
     const noEliminada = estado !== "eliminada";
-    const matchesSearch = p.enunciado.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    const matchesSearch = (p.enunciado || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
+                         (p.textoInicial || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (p.textoPosterior || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
                          p.componente?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          p.autorNombre?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCompetencia = filterCompetencia === 'TODOS' || p.competencia === filterCompetencia;
@@ -173,12 +175,17 @@ export default function BancoPreguntas() {
                           {p.id}
                         </div>
                         <div className="max-w-md">
-                          <p className="text-slate-700 font-bold leading-relaxed line-clamp-2">{p.enunciado}</p>
+                          <p className="text-slate-700 font-bold leading-relaxed line-clamp-2">{p.textoInicial || p.enunciado}</p>
                           <div className="flex items-center gap-3 mt-1">
                             <p className="text-[10px] text-slate-400 uppercase font-black tracking-widest">{p.componente || 'Matemáticas'}</p>
                             {p.imagen && (
                               <span className="flex items-center gap-1 text-[10px] text-emerald-600 font-black uppercase tracking-widest bg-emerald-50 px-2 py-0.5 rounded-md">
-                                <ImageIcon size={10} /> Con imagen
+                                <ImageIcon size={10} /> Imagen
+                              </span>
+                            )}
+                            {p.textoPosterior && (
+                              <span className="flex items-center gap-1 text-[10px] text-indigo-600 font-black uppercase tracking-widest bg-indigo-50 px-2 py-0.5 rounded-md">
+                                <Book size={10} /> Con texto posterior
                               </span>
                             )}
                           </div>
@@ -263,8 +270,8 @@ export default function BancoPreguntas() {
                 <p className="text-slate-500 font-medium mb-6">Esta acción es irreversible y afectará a los simulacros que contengan esta pregunta.</p>
                 
                 <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 text-left mb-6">
-                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Enunciado</p>
-                   <p className="text-sm font-bold text-slate-700 line-clamp-3 italic">"{showDeleteConfirm.enunciado}"</p>
+                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Enunciado / Texto Inicial</p>
+                   <p className="text-sm font-bold text-slate-700 line-clamp-3 italic">"{showDeleteConfirm.textoInicial || showDeleteConfirm.enunciado}"</p>
                 </div>
 
                 <div className="flex gap-3">

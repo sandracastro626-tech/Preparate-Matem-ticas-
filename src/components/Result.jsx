@@ -143,7 +143,25 @@ export default function Result({ result, onBack }) {
                     )}
                   </div>
                   <div className="p-10">
-                    <p className="text-xl text-slate-800 mb-8 font-extrabold leading-relaxed">{p.enunciado}</p>
+                    <p className="text-base text-slate-800 mb-6 font-bold leading-relaxed whitespace-pre-line">
+                      {p.textoInicial || p.enunciado}
+                    </p>
+
+                    {p.imagen && (
+                      <div className="mb-6 rounded-2xl border border-slate-50 overflow-hidden bg-slate-50 flex justify-center p-4">
+                        <img 
+                          src={p.imagen} 
+                          alt="Imagen de apoyo" 
+                          className="max-h-80 w-auto object-contain rounded-xl"
+                        />
+                      </div>
+                    )}
+
+                    {p.textoPosterior && (
+                      <p className="text-lg text-slate-900 mb-8 font-extrabold leading-relaxed">
+                        {p.textoPosterior}
+                      </p>
+                    )}
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
                       {Object.entries(p.opciones).map(([k, v]) => (

@@ -120,21 +120,29 @@ export default function Simulacro({ drill, onFinish }) {
             className="bg-white p-8 md:p-12 rounded-3xl border border-slate-100 shadow-xl"
           >
             <div className="mb-8">
-              <span className="px-3 py-1 bg-red-50 text-red-600 rounded-full text-xs font-bold uppercase tracking-wider mb-4 inline-block">
-                {activePregunta.area}
+              <span className="px-3 py-1 bg-red-50 text-red-600 rounded-full text-xs font-bold uppercase tracking-wider mb-6 inline-block">
+                {activePregunta.competencia}
               </span>
-              <h3 className="text-xl md:text-2xl font-medium text-slate-800 leading-relaxed">
-                {activePregunta.enunciado}
-              </h3>
+              <p className="text-lg md:text-xl font-medium text-slate-800 leading-relaxed whitespace-pre-line">
+                {activePregunta.textoInicial || activePregunta.enunciado}
+              </p>
             </div>
 
             {activePregunta.imagen && (
-              <div className="mb-8 rounded-2xl border border-slate-100 overflow-hidden bg-white shadow-sm p-2">
+              <div className="mb-8 rounded-2xl border border-slate-100 overflow-hidden bg-white shadow-sm p-4 flex justify-center">
                 <img 
                   src={activePregunta.imagen} 
                   alt="Imagen de apoyo" 
-                  className="max-h-96 w-full object-contain rounded-xl"
+                  className="max-h-[450px] w-auto object-contain rounded-xl"
                 />
+              </div>
+            )}
+
+            {activePregunta.textoPosterior && (
+              <div className="mb-8 p-6 bg-slate-50 rounded-2xl border-l-4 border-red-600">
+                <p className="text-lg md:text-xl font-bold text-slate-900 leading-relaxed">
+                  {activePregunta.textoPosterior}
+                </p>
               </div>
             )}
 
