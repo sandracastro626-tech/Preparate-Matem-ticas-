@@ -45,6 +45,7 @@ export default function BancoPreguntas() {
     const matchesSearch = (p.enunciado || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
                          (p.textoInicial || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
                          (p.textoPosterior || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (p.bloques || []).some(b => b.type === 'text' && b.content.toLowerCase().includes(searchTerm.toLowerCase())) ||
                          p.componente?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          p.autorNombre?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCompetencia = filterCompetencia === 'TODOS' || p.competencia === filterCompetencia;
@@ -176,16 +177,16 @@ export default function BancoPreguntas() {
                         </div>
                         <div className="max-w-md">
                           <p className="text-slate-700 font-bold leading-relaxed line-clamp-2">{p.textoInicial || p.enunciado}</p>
-                          <div className="flex items-center gap-3 mt-1">
+                          <div className="flex items-center gap-3 mt-1 flex-wrap">
                             <p className="text-[10px] text-slate-400 uppercase font-black tracking-widest">{p.componente || 'Matemáticas'}</p>
-                            {p.imagen && (
+                            {((p.bloques && p.bloques.filter(b => b.type === 'image').length > 0) || p.imagen) && (
                               <span className="flex items-center gap-1 text-[10px] text-emerald-600 font-black uppercase tracking-widest bg-emerald-50 px-2 py-0.5 rounded-md">
-                                <ImageIcon size={10} /> Imagen
+                                <ImageIcon size={10} /> {p.bloques ? `${p.bloques.filter(b => b.type === 'image').length} Imágenes` : 'Imagen'}
                               </span>
                             )}
-                            {p.textoPosterior && (
+                            {((p.bloques && p.bloques.length > 3) || p.textoPosterior) && (
                               <span className="flex items-center gap-1 text-[10px] text-indigo-600 font-black uppercase tracking-widest bg-indigo-50 px-2 py-0.5 rounded-md">
-                                <Book size={10} /> Con texto posterior
+                                <Plus size={10} /> {p.bloques ? 'Dinámica' : 'Posterior'}
                               </span>
                             )}
                           </div>

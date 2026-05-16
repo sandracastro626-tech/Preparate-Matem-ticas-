@@ -1,9 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useApp } from '../context/AppContext';
 import { calcularResultados } from '../utils/analysis';
 import { Clock, Send, ChevronRight, ChevronLeft, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { crearNotificacion } from '../utils/notifications';
+
+// Helper de compatibilidad para bloques
+const getQuestionBloques = (p) => {
+  if (p.bloques && Array.isArray(p.bloques)) return p.bloques;
+  
+  const bloques = [];
+  if (p.textoInicial || p.enunciado) bloques.push({ id: 't1', type: 'text', content: p.textoInicial || p.enunciado });
+  if (p.imagen) bloques.push({ id: 'i1', type: 'image', content: p.imagen });
+  if (p.textoPosterior) bloques.push({ id: 't2', type: 'text', content: p.textoPosterior });
+  return bloques;
+};
 
 export default function Simulacro({ drill, onFinish }) {
   const { preguntas, user, addIntento } = useApp();
@@ -14,6 +25,11 @@ export default function Simulacro({ drill, onFinish }) {
 
   const drillPreguntas = preguntas.filter(p => (drill.preguntasIds || drill.preguntas || []).includes(p.id));
   const activePregunta = drillPreguntas[currentIdx];
+
+  const currentBloques = useMemo(() => {
+    if (!activePregunta) return [];
+    return getQuestionBloques(activePregunta);
+  }, [activePregunta]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -123,28 +139,27 @@ export default function Simulacro({ drill, onFinish }) {
               <span className="px-3 py-1 bg-red-50 text-red-600 rounded-full text-xs font-bold uppercase tracking-wider mb-6 inline-block">
                 {activePregunta.competencia}
               </span>
-              <p className="text-lg md:text-xl font-medium text-slate-800 leading-relaxed whitespace-pre-line">
-                {activePregunta.textoInicial || activePregunta.enunciado}
-              </p>
+              
+              <div className="space-y-6">
+                {currentBloques.map((block) => (
+                  <div key={block.id}>
+                    {block.type === 'text' ? (
+                      <p className="text-lg md:text-xl font-medium text-slate-800 leading-relaxed whitespace-pre-line">
+                        {block.content}
+                      </p>
+                    ) : (
+                      <div className="rounded-2xl border border-slate-100 overflow-hidden bg-white shadow-sm p-4 flex justify-center">
+                        <img 
+                          src={block.content} 
+                          alt="Contenido de apoyo" 
+                          className="max-h-[450px] w-auto object-contain rounded-xl"
+                        />
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
-
-            {activePregunta.imagen && (
-              <div className="mb-8 rounded-2xl border border-slate-100 overflow-hidden bg-white shadow-sm p-4 flex justify-center">
-                <img 
-                  src={activePregunta.imagen} 
-                  alt="Imagen de apoyo" 
-                  className="max-h-[450px] w-auto object-contain rounded-xl"
-                />
-              </div>
-            )}
-
-            {activePregunta.textoPosterior && (
-              <div className="mb-8 p-6 bg-slate-50 rounded-2xl border-l-4 border-red-600">
-                <p className="text-lg md:text-xl font-bold text-slate-900 leading-relaxed">
-                  {activePregunta.textoPosterior}
-                </p>
-              </div>
-            )}
 
             <div className="space-y-4">
               {Object.entries(activePregunta.opciones).map(([key, valor]) => (

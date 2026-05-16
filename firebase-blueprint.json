@@ -1,0 +1,90 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile with roles and metadata.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "nombreCompleto": { "type": "string" },
+        "email": { "type": "string" },
+        "rol": { "type": "string", "enum": ["administrador", "docente", "estudiante"] },
+        "estado": { "type": "string", "enum": ["activo", "inactivo"] },
+        "institucion": { "type": "string" },
+        "grupo": { "type": "string" },
+        "codigoEstudiante": { "type": "string" },
+        "numeroDocumento": { "type": "string" },
+        "fechaCreacion": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "nombreCompleto", "email", "rol", "estado"]
+    },
+    "Pregunta": {
+      "title": "Pregunta",
+      "description": "A question for the bank.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "textoInicial": { "type": "string" },
+        "enunciado": { "type": "string" },
+        "textoPosterior": { "type": "string" },
+        "imagen": { "type": "string" },
+        "bloques": { "type": "array" },
+        "opciones": { "type": "object" },
+        "respuestaCorrecta": { "type": "string" },
+        "competencia": { "type": "string" },
+        "componente": { "type": "string" },
+        "dificultad": { "type": "string" },
+        "creadoPor": { "type": "string" },
+        "autorNombre": { "type": "string" },
+        "autorRol": { "type": "string" },
+        "estado": { "type": "string" },
+        "fechaCreacion": { "type": "string", "format": "date-time" }
+      }
+    },
+    "Simulacro": {
+      "title": "Simulacro",
+      "description": "An exam or mock test.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "nombre": { "type": "string" },
+        "descripcion": { "type": "string" },
+        "preguntasIds": { "type": "array" },
+        "creadoPor": { "type": "string" },
+        "estado": { "type": "string" },
+        "fechaCreacion": { "type": "string", "format": "date-time" }
+      }
+    },
+    "Intento": {
+      "title": "Intento",
+      "description": "A student's attempt at a simulacro.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "estudianteId": { "type": "string" },
+        "simulacroId": { "type": "string" },
+        "respuestas": { "type": "object" },
+        "puntaje": { "type": "number" },
+        "fechaFinalizacion": { "type": "string", "format": "date-time" }
+      }
+    }
+  },
+  "firestore": {
+    "users": {
+      "schema": "User",
+      "description": "Collection of user profiles."
+    },
+    "preguntas": {
+      "schema": "Pregunta",
+      "description": "Collection of questions."
+    },
+    "simulacros": {
+      "schema": "Simulacro",
+      "description": "Collection of exams."
+    },
+    "intentos": {
+      "schema": "Intento",
+      "description": "Collection of student attempts."
+    }
+  }
+}

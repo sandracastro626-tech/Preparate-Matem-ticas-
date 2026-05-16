@@ -1,11 +1,23 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { 
   Trophy, CheckCircle2, XCircle, ArrowLeft, 
-  ChevronDown, MessageCircle, AlertCircle, FileText
+  ChevronDown, MessageCircle, AlertCircle, FileText,
+  BarChart3
 } from 'lucide-react';
 import { BarDesempeño, RadarDesempeño } from './Charts';
 import { generarRecomendaciones } from '../utils/analysis';
 import { motion } from 'motion/react';
+
+// Helper de compatibilidad para bloques
+const getQuestionBloques = (p) => {
+  if (p.bloques && Array.isArray(p.bloques)) return p.bloques;
+  
+  const bloques = [];
+  if (p.textoInicial || p.enunciado) bloques.push({ id: 't1', type: 'text', content: p.textoInicial || p.enunciado });
+  if (p.imagen) bloques.push({ id: 'i1', type: 'image', content: p.imagen });
+  if (p.textoPosterior) bloques.push({ id: 't2', type: 'text', content: p.textoPosterior });
+  return bloques;
+};
 
 export default function Result({ result, onBack }) {
   const recomendaciones = generarRecomendaciones(result);
@@ -143,25 +155,25 @@ export default function Result({ result, onBack }) {
                     )}
                   </div>
                   <div className="p-10">
-                    <p className="text-base text-slate-800 mb-6 font-bold leading-relaxed whitespace-pre-line">
-                      {p.textoInicial || p.enunciado}
-                    </p>
-
-                    {p.imagen && (
-                      <div className="mb-6 rounded-2xl border border-slate-50 overflow-hidden bg-slate-50 flex justify-center p-4">
-                        <img 
-                          src={p.imagen} 
-                          alt="Imagen de apoyo" 
-                          className="max-h-80 w-auto object-contain rounded-xl"
-                        />
-                      </div>
-                    )}
-
-                    {p.textoPosterior && (
-                      <p className="text-lg text-slate-900 mb-8 font-extrabold leading-relaxed">
-                        {p.textoPosterior}
-                      </p>
-                    )}
+                    <div className="space-y-6 mb-10">
+                      {getQuestionBloques(p).map((block) => (
+                        <div key={block.id}>
+                          {block.type === 'text' ? (
+                            <p className="text-base text-slate-800 font-bold leading-relaxed whitespace-pre-line">
+                              {block.content}
+                            </p>
+                          ) : (
+                            <div className="rounded-2xl border border-slate-50 overflow-hidden bg-slate-50 flex justify-center p-4">
+                              <img 
+                                src={block.content} 
+                                alt="Contenido de apoyo" 
+                                className="max-h-80 w-auto object-contain rounded-xl"
+                              />
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
                       {Object.entries(p.opciones).map(([k, v]) => (

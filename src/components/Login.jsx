@@ -1,26 +1,70 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { BookOpen, User, GraduationCap, ArrowRight, LogIn } from 'lucide-react';
+import { BookOpen, User, GraduationCap, ArrowRight, LogIn, AlertCircle, CheckCircle2 } from 'lucide-react';
 
 export default function Login() {
-  const { login } = useApp();
+  const { login, loginWithGoogle, registerUser } = useApp();
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setSuccess('');
     setIsLoading(true);
     
-    // Simulate slight delay for professional feel
-    setTimeout(() => {
-      const res = login(formData.email, formData.password);
+    try {
+      const res = await login(formData.email, formData.password);
       if (!res.success) {
         setError(res.message);
         setIsLoading(false);
       }
-    }, 500);
+    } catch (err) {
+      setError("Error al iniciar sesión. Intente de nuevo.");
+      setIsLoading(false);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    setIsLoading(true);
+    setError('');
+    try {
+      const res = await loginWithGoogle();
+      if (!res.success) {
+        setError(res.message);
+      }
+    } catch (err) {
+      setError("Error con Google login: " + err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSeedAdmin = async () => {
+    setIsLoading(true);
+    setError('');
+    setSuccess('');
+    try {
+      const res = await registerUser({
+        nombreCompleto: "Sandra Castro",
+        usuario: "sandra",
+        email: "sandraandersoncy@gmail.com",
+        contrasena: "Admin123*",
+        rol: "administrador",
+        estado: "activo"
+      });
+      if (res.success) {
+        setSuccess("Administrador creado: sandraandersoncy@gmail.com. Ahora puedes iniciar sesión con la contraseña Admin123*");
+      } else {
+        setError(res.message);
+      }
+    } catch (err) {
+      setError("Error al inicializar: " + err.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -98,6 +142,13 @@ export default function Login() {
               </div>
             )}
 
+            {success && (
+              <div className="bg-emerald-50 text-emerald-600 p-4 rounded-2xl text-[11px] font-black border border-emerald-100 flex items-center gap-3 uppercase tracking-wider">
+                <CheckCircle2 size={18} />
+                {success}
+              </div>
+            )}
+
             <button 
               type="submit"
               disabled={isLoading}
@@ -106,9 +157,36 @@ export default function Login() {
               {isLoading ? 'Verificando...' : 'Iniciar Sesión'}
               {!isLoading && <ArrowRight size={20} />}
             </button>
+
+            <div className="relative my-8">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-slate-100"></div>
+              </div>
+              <div className="relative flex justify-center text-[10px] font-black uppercase tracking-widest">
+                <span className="bg-white px-4 text-slate-400">O ingresa con</span>
+              </div>
+            </div>
+
+            <button 
+              type="button"
+              onClick={handleGoogleLogin}
+              disabled={isLoading}
+              className="w-full py-5 bg-white border-2 border-slate-100 hover:border-blue-600 hover:bg-blue-50 text-slate-700 rounded-2xl font-black flex items-center justify-center gap-4 transition-all disabled:opacity-70 uppercase tracking-widest text-sm"
+            >
+              <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-6 h-6" />
+              Continuar con Google
+            </button>
           </form>
 
-          <div className="mt-10 text-center">
+          <div className="mt-8 pt-8 border-t border-slate-100 flex flex-col gap-4">
+             <button 
+              type="button"
+              onClick={handleSeedAdmin}
+              disabled={isLoading}
+              className="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline disabled:opacity-50"
+            >
+              Inicializar Administrador (Prueba)
+            </button>
             <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest">
               ¿Olvidaste tu contraseña? <span className="text-blue-700 font-black cursor-pointer hover:underline">Contacta al Administrador</span>
             </p>
@@ -116,13 +194,5 @@ export default function Login() {
         </div>
       </div>
     </div>
-  );
-}
-
-function AlertCircle({ size }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-    </svg>
   );
 }

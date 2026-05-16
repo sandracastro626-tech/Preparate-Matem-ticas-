@@ -53,6 +53,7 @@ export default function BancoPreguntasDocente() {
     const matchesSearch = (p.enunciado || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
                          (p.textoInicial || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
                          (p.textoPosterior || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (p.bloques || []).some(b => b.type === 'text' && b.content.toLowerCase().includes(searchTerm.toLowerCase())) ||
                          p.competencia.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          p.autorNombre?.toLowerCase().includes(searchTerm.toLowerCase());
     
@@ -163,15 +164,16 @@ export default function BancoPreguntasDocente() {
                     </span>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  {p.imagen && (
+                <div className="flex items-center gap-2 flex-wrap">
+                  {((p.bloques && p.bloques.filter(b => b.type === 'image').length > 0) || p.imagen) && (
                     <span className="flex items-center gap-1 text-[8px] text-emerald-600 font-black uppercase tracking-widest bg-emerald-50 px-2 py-0.5 rounded-md">
-                      <ImageIcon size={10} /> Imagen
+                      <ImageIcon size={10} /> 
+                      {p.bloques ? `${p.bloques.filter(b => b.type === 'image').length} Imágenes` : 'Imagen'}
                     </span>
                   )}
-                  {p.textoPosterior && (
+                  {((p.bloques && p.bloques.length > 3) || p.textoPosterior) && (
                     <span className="flex items-center gap-1 text-[8px] text-indigo-600 font-black uppercase tracking-widest bg-indigo-50 px-2 py-0.5 rounded-md">
-                      <BookOpen size={10} /> Posterior
+                      <Plus size={10} /> {p.bloques ? 'Dinámica' : 'Posterior'}
                     </span>
                   )}
                   <span className="text-[10px] font-black text-slate-300">ID: {p.id}</span>

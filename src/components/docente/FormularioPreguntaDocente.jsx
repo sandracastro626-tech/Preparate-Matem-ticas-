@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { X, Save, HelpCircle, CheckCircle2 } from 'lucide-react';
+import { X, Save, HelpCircle, CheckCircle2, Plus, Image as ImageIcon, Type, Trash2, ArrowUp, ArrowDown } from 'lucide-react';
 import ImageUploader from '../shared/ImageUploader';
 
 export default function FormularioPreguntaDocente({ pregunta, onSave, onCancel }) {
   const [formData, setFormData] = useState({
-    textoInicial: '',
-    textoPosterior: '',
+    bloques: [
+      { id: Date.now(), type: 'text', content: '' }
+    ],
     enunciado: '',
     competencia: 'Interpretación y representación',
     componente: 'Numérico-variacional',
@@ -20,10 +21,6 @@ export default function FormularioPreguntaDocente({ pregunta, onSave, onCancel }
     respuestaCorrecta: 'A',
     explicacion: '',
     retroalimentacionIncorrecta: '',
-    imagen: '',
-    imagenNombre: '',
-    imagenTipo: '',
-    imagenFuente: '',
     visibilidad: 'compartida',
     visiblePara: ['administrador', 'docente'],
     seleccionable: true,
@@ -32,26 +29,71 @@ export default function FormularioPreguntaDocente({ pregunta, onSave, onCancel }
 
   useEffect(() => {
     if (pregunta) {
+      // Migración / Compatibilidad
+      let initialBloques = pregunta.bloques;
+      if (!initialBloques || !Array.isArray(initialBloques)) {
+        initialBloques = [];
+        if (pregunta.textoInicial || pregunta.enunciado) {
+          initialBloques.push({ id: 1, type: 'text', content: pregunta.textoInicial || pregunta.enunciado });
+        }
+        if (pregunta.imagen) {
+          initialBloques.push({ id: 2, type: 'image', content: pregunta.imagen });
+        }
+        if (pregunta.textoPosterior) {
+          initialBloques.push({ id: 3, type: 'text', content: pregunta.textoPosterior });
+        }
+      }
+
       setFormData({ 
         ...pregunta,
-        textoInicial: pregunta.textoInicial || pregunta.enunciado || '',
-        textoPosterior: pregunta.textoPosterior || ''
+        bloques: initialBloques.length > 0 ? initialBloques : [{ id: Date.now(), type: 'text', content: '' }]
       });
     }
   }, [pregunta]);
 
-  const handleImageChange = (imageData) => {
+  const addBlock = (type) => {
     setFormData(prev => ({
       ...prev,
-      ...imageData
+      bloques: [...prev.bloques, { 
+        id: Date.now(), 
+        type, 
+        content: '' 
+      }]
     }));
+  };
+
+  const removeBlock = (id) => {
+    setFormData(prev => ({
+      ...prev,
+      bloques: prev.bloques.filter(b => b.id !== id)
+    }));
+  };
+
+  const updateBlock = (id, content) => {
+    setFormData(prev => ({
+      ...prev,
+      bloques: prev.bloques.map(b => b.id === id ? { ...b, content } : b)
+    }));
+  };
+
+  const moveBlock = (index, direction) => {
+    const newBloques = [...formData.bloques];
+    const targetIndex = index + direction;
+    if (targetIndex < 0 || targetIndex >= newBloques.length) return;
+    
+    [newBloques[index], newBloques[targetIndex]] = [newBloques[targetIndex], newBloques[index]];
+    setFormData(prev => ({ ...prev, bloques: newBloques }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    
+    // Extraer un enunciado simplificado para búsquedas rápidas (primer bloque de texto)
+    const primerTexto = formData.bloques.find(b => b.type === 'text')?.content || '';
+    
     const dataToSave = {
       ...formData,
-      enunciado: formData.textoInicial
+      enunciado: primerTexto
     };
     onSave(dataToSave);
   };
@@ -70,7 +112,7 @@ export default function FormularioPreguntaDocente({ pregunta, onSave, onCancel }
             </div>
             <div>
               <h2 className="text-2xl font-black">{pregunta ? 'Editar Pregunta' : 'Crear Pregunta'}</h2>
-              <p className="text-indigo-400 text-[10px] font-black uppercase tracking-widest mt-0.5">Estructura Flexible tipo ICFES</p>
+              <p className="text-indigo-400 text-[10px] font-black uppercase tracking-widest mt-0.5">Estructura Flexible Dinámica</p>
             </div>
           </div>
           <button onClick={onCancel} className="p-3 hover:bg-white/10 rounded-full transition-colors font-black">
@@ -82,40 +124,64 @@ export default function FormularioPreguntaDocente({ pregunta, onSave, onCancel }
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
             {/* Left Column: Form content */}
             <div className="space-y-6">
-              <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">1. Texto inicial de la pregunta (Contexto)</label>
-                <textarea 
-                  required
-                  rows="4"
-                  className="w-full px-8 py-6 bg-slate-50 border-2 border-slate-50 rounded-[2rem] focus:border-indigo-500 focus:bg-white outline-none transition-all font-bold text-slate-700 leading-relaxed"
-                  placeholder="Escribe aquí el contexto inicial de la pregunta..."
-                  value={formData.textoInicial}
-                  onChange={(e) => setFormData({...formData, textoInicial: e.target.value})}
-                />
+              <div className="flex items-center justify-between px-2">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Contenido de la Pregunta</label>
+                <div className="flex gap-2">
+                  <button 
+                    type="button" 
+                    onClick={() => addBlock('text')}
+                    className="flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-indigo-50 hover:text-indigo-600 transition-all"
+                  >
+                    <Type size={14} /> Texto
+                  </button>
+                  <button 
+                    type="button" 
+                    onClick={() => addBlock('image')}
+                    className="flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-50 hover:text-emerald-600 transition-all"
+                  >
+                    <ImageIcon size={14} /> Imagen
+                  </button>
+                </div>
               </div>
 
-              <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">2. Imagen, tabla o gráfico de apoyo</label>
-                <ImageUploader 
-                  initialImage={formData.imagen} 
-                  onImageChange={handleImageChange} 
-                />
-              </div>
+              <div className="space-y-4">
+                {formData.bloques.map((block, index) => (
+                  <div key={block.id} className="relative group bg-slate-50/50 p-6 rounded-[2rem] border-2 border-transparent hover:border-slate-100 transition-all">
+                    {/* Controls */}
+                    <div className="absolute -left-3 top-1/2 -translate-y-1/2 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-all z-10">
+                      <button type="button" onClick={() => moveBlock(index, -1)} className="p-1.5 bg-white shadow-md rounded-lg text-slate-400 hover:text-indigo-600"><ArrowUp size={14}/></button>
+                      <button type="button" onClick={() => moveBlock(index, 1)} className="p-1.5 bg-white shadow-md rounded-lg text-slate-400 hover:text-indigo-600"><ArrowDown size={14}/></button>
+                    </div>
+                    
+                    <div className="absolute -right-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all z-10">
+                      <button type="button" onClick={() => removeBlock(block.id)} className="p-2 bg-white shadow-md rounded-full text-rose-400 hover:text-rose-600 hover:scale-110 transition-all"><Trash2 size={16}/></button>
+                    </div>
 
-              <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">3. Texto posterior a la imagen (Pregunta final)</label>
-                <textarea 
-                  rows="3"
-                  className="w-full px-8 py-6 bg-slate-50 border-2 border-slate-50 rounded-[2rem] focus:border-indigo-500 focus:bg-white outline-none transition-all font-bold text-slate-700 leading-relaxed"
-                  placeholder="Escribe aquí la pregunta final o instrucción después de la imagen..."
-                  value={formData.textoPosterior}
-                  onChange={(e) => setFormData({...formData, textoPosterior: e.target.value})}
-                />
+                    {block.type === 'text' ? (
+                      <textarea 
+                        required
+                        className="w-full bg-transparent outline-none font-bold text-slate-700 leading-relaxed resize-none overflow-hidden"
+                        placeholder="Escribe el contenido del bloque de texto..."
+                        rows={block.content.split('\n').length + 2}
+                        value={block.content}
+                        onChange={(e) => updateBlock(block.id, e.target.value)}
+                      />
+                    ) : (
+                      <div className="flex flex-col items-center">
+                        <ImageUploader 
+                          initialImage={block.content} 
+                          onImageChange={(img) => updateBlock(block.id, img.imagen)} 
+                          label="Cargar imagen en esta posición"
+                        />
+                      </div>
+                    )}
+                  </div>
+                ))}
               </div>
 
               {/* Options Grid */}
-              <div className="space-y-6 pt-4">
-                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">4. Opciones de Respuesta</label>
+              <div className="space-y-6 pt-10">
+                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Opciones de Respuesta</label>
                  <div className="grid grid-cols-1 gap-4">
                     {['A', 'B', 'C', 'D'].map(opt => (
                       <div key={opt} className={`relative flex items-center p-2 rounded-2xl border-2 transition-all ${formData.respuestaCorrecta === opt ? 'border-emerald-500 bg-emerald-50/30' : 'border-slate-50 bg-slate-50 hover:border-slate-200'}`}>
@@ -153,25 +219,27 @@ export default function FormularioPreguntaDocente({ pregunta, onSave, onCancel }
               <div className="bg-slate-50 rounded-[2.5rem] p-8 border-2 border-dashed border-slate-200">
                 <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-6">Vista Previa</h4>
                 <div className="bg-white rounded-3xl p-8 shadow-sm min-h-[300px]">
-                  <p className="text-base text-slate-900 whitespace-pre-line font-medium mb-6">
-                    {formData.textoInicial || 'Sin texto inicial...'}
-                  </p>
-
-                  {formData.imagen && (
-                    <div className="my-6 flex justify-center bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                      <img
-                        src={formData.imagen}
-                        alt="Vista previa apoyo"
-                        className="max-h-52 rounded-lg object-contain"
-                      />
+                  {formData.bloques.map((block) => (
+                    <div key={block.id} className="mb-4 last:mb-0">
+                      {block.type === 'text' ? (
+                        <p className="text-base text-slate-900 whitespace-pre-line font-medium">
+                          {block.content || '...'}
+                        </p>
+                      ) : block.content ? (
+                        <div className="my-6 flex justify-center bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                          <img
+                            src={block.content}
+                            alt="Vista previa apoyo"
+                            className="max-h-52 rounded-lg object-contain"
+                          />
+                        </div>
+                      ) : (
+                        <div className="my-6 p-10 border-2 border-dashed border-slate-100 rounded-2xl flex items-center justify-center text-slate-300 text-xs font-bold uppercase">
+                           Imagen no cargada
+                        </div>
+                      )}
                     </div>
-                  )}
-
-                  {formData.textoPosterior && (
-                    <p className="mt-6 text-base text-slate-900 whitespace-pre-line font-medium mb-6">
-                      {formData.textoPosterior}
-                    </p>
-                  )}
+                  ))}
 
                   <div className="mt-8 space-y-3">
                     {Object.entries(formData.opciones).map(([k, v]) => (

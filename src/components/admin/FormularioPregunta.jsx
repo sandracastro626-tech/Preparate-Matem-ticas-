@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { X, Save, AlertCircle, Image as ImageIcon, CheckCircle2 } from 'lucide-react';
+import { X, Save, AlertCircle, Image as ImageIcon, CheckCircle2, Plus, Type, Trash2, ArrowUp, ArrowDown } from 'lucide-react';
 import ImageUploader from '../shared/ImageUploader';
 
 export default function FormularioPregunta({ pregunta, onSave, onCancel }) {
   const [formData, setFormData] = useState({
-    textoInicial: '',
-    textoPosterior: '',
-    enunciado: '',
+    bloques: [
+      { id: '1', type: 'text', content: '' }
+    ],
     opciones: { A: '', B: '', C: '', D: '' },
     respuestaCorrecta: 'A',
     competencia: 'Interpretación y representación',
@@ -18,11 +18,6 @@ export default function FormularioPregunta({ pregunta, onSave, onCancel }) {
     afirmacion: '',
     evidencia: '',
     contexto: '',
-    imagen: '',
-    imagenNombre: '',
-    imagenTipo: '',
-    imagenFuente: '',
-    imagenUrl: '',
     visibilidad: 'global',
     visiblePara: ['administrador', 'docente'],
     seleccionable: true,
@@ -31,30 +26,70 @@ export default function FormularioPregunta({ pregunta, onSave, onCancel }) {
 
   useEffect(() => {
     if (pregunta) {
+      const bloques = pregunta.bloques && pregunta.bloques.length > 0 
+        ? pregunta.bloques 
+        : [
+            ...(pregunta.textoInicial || pregunta.enunciado ? [{ id: 't1', type: 'text', content: pregunta.textoInicial || pregunta.enunciado }] : []),
+            ...(pregunta.imagen ? [{ id: 'i1', type: 'image', content: pregunta.imagen }] : []),
+            ...(pregunta.textoPosterior ? [{ id: 't2', type: 'text', content: pregunta.textoPosterior }] : []),
+            ...(pregunta.bloques === undefined && !pregunta.textoInicial && !pregunta.enunciado && !pregunta.imagen ? [{ id: '1', type: 'text', content: '' }] : [])
+          ];
+
       setFormData({
         ...pregunta,
-        textoInicial: pregunta.textoInicial || pregunta.enunciado || '',
-        textoPosterior: pregunta.textoPosterior || '',
+        bloques: bloques.length > 0 ? bloques : [{ id: '1', type: 'text', content: '' }],
         opciones: { ...pregunta.opciones }
       });
     }
   }, [pregunta]);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Maintain compatibility: set enunciado to textoInicial
-    const dataToSave = {
-      ...formData,
-      enunciado: formData.textoInicial
-    };
-    onSave(dataToSave);
-  };
-
-  const handleImageChange = (imageData) => {
+  const addBloque = (type) => {
     setFormData(prev => ({
       ...prev,
-      ...imageData
+      bloques: [...prev.bloques, { 
+        id: Math.random().toString(36).substr(2, 9), 
+        type, 
+        content: '' 
+      }]
     }));
+  };
+
+  const removeBloque = (id) => {
+    if (formData.bloques.length <= 1) return;
+    setFormData(prev => ({
+      ...prev,
+      bloques: prev.bloques.filter(b => b.id !== id)
+    }));
+  };
+
+  const updateBloque = (id, content) => {
+    setFormData(prev => ({
+      ...prev,
+      bloques: prev.bloques.map(b => b.id === id ? { ...b, content } : b)
+    }));
+  };
+
+  const moveBloque = (idx, direction) => {
+    const newBloques = [...formData.bloques];
+    const targetIdx = idx + direction;
+    if (targetIdx < 0 || targetIdx >= newBloques.length) return;
+    [newBloques[idx], newBloques[targetIdx]] = [newBloques[targetIdx], newBloques[idx]];
+    setFormData(prev => ({ ...prev, bloques: newBloques }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    
+    const primerTexto = formData.bloques.find(b => b.type === 'text')?.content || '';
+    const primeraImagen = formData.bloques.find(b => b.type === 'image')?.content || '';
+    
+    const dataToSave = {
+      ...formData,
+      enunciado: primerTexto,
+      textoInicial: primerTexto,
+      imagen: primeraImagen
+    };
+    onSave(dataToSave);
   };
 
   const handleOpcionChange = (key, value) => {
@@ -69,12 +104,12 @@ export default function FormularioPregunta({ pregunta, onSave, onCancel }) {
       <motion.div
         initial={{ opacity: 0, scale: 0.9, y: 50 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        className="bg-white rounded-[3rem] shadow-2xl w-full max-w-4xl my-8 overflow-hidden border border-slate-100"
+        className="bg-white rounded-[3rem] shadow-2xl w-full max-w-5xl my-8 overflow-hidden border border-slate-100"
       >
         <div className="bg-indigo-600 p-8 text-white flex justify-between items-center">
           <div>
             <h2 className="text-3xl font-black">{pregunta ? 'Editar Pregunta' : 'Nueva Pregunta'}</h2>
-            <p className="text-indigo-100 font-bold uppercase text-[10px] tracking-[0.2em] mt-1">Estructura flexible tipo ICFES</p>
+            <p className="text-indigo-100 font-bold uppercase text-[10px] tracking-[0.2em] mt-1">Estructura flexible de bloques (ICFES)</p>
           </div>
           <button onClick={onCancel} className="p-3 hover:bg-white/10 rounded-full transition-colors">
             <X size={24} />
@@ -83,114 +118,133 @@ export default function FormularioPregunta({ pregunta, onSave, onCancel }) {
 
         <form onSubmit={handleSubmit} className="p-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-            {/* Left Column: Form content */}
+            {/* Left Column: Dynamic Blocks */}
             <div className="space-y-6">
-              <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">1. Texto inicial de la pregunta (Contexto)</label>
-                <textarea 
-                  required
-                  rows="4"
-                  className="w-full px-6 py-5 bg-slate-50 border-2 border-slate-50 rounded-[2rem] focus:border-indigo-500 focus:bg-white outline-none transition-all font-bold text-slate-800 placeholder:text-slate-300"
-                  placeholder="Escribe aquí el contexto inicial de la pregunta..."
-                  value={formData.textoInicial}
-                  onChange={(e) => setFormData({...formData, textoInicial: e.target.value})}
-                />
+              <div className="flex items-center justify-between mb-4">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Constructor de pregunta</label>
+                <div className="flex gap-2">
+                  <button 
+                    type="button" 
+                    onClick={() => addBloque('text')}
+                    className="flex items-center gap-2 px-3 py-1.5 bg-slate-100 text-slate-600 rounded-lg text-[10px] font-black uppercase hover:bg-indigo-50 hover:text-indigo-600 transition-all"
+                  >
+                    <Type size={14} /> + Texto
+                  </button>
+                  <button 
+                    type="button" 
+                    onClick={() => addBloque('image')}
+                    className="flex items-center gap-2 px-3 py-1.5 bg-slate-100 text-slate-600 rounded-lg text-[10px] font-black uppercase hover:bg-emerald-50 hover:text-emerald-600 transition-all"
+                  >
+                    <ImageIcon size={14} /> + Imagen
+                  </button>
+                </div>
               </div>
 
-              <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">2. Imagen, tabla o gráfico de apoyo</label>
-                <ImageUploader 
-                  initialImage={formData.imagen} 
-                  onImageChange={handleImageChange} 
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">3. Texto posterior a la imagen (Pregunta final)</label>
-                <textarea 
-                  rows="3"
-                  className="w-full px-6 py-5 bg-slate-50 border-2 border-slate-50 rounded-[2rem] focus:border-indigo-500 focus:bg-white outline-none transition-all font-bold text-slate-800 placeholder:text-slate-300"
-                  placeholder="Escribe aquí la pregunta final o instrucción después de la imagen..."
-                  value={formData.textoPosterior}
-                  onChange={(e) => setFormData({...formData, textoPosterior: e.target.value})}
-                />
-              </div>
-
-              <div className="space-y-4 pt-4">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">4. Opciones de Respuesta</label>
-                {['A', 'B', 'C', 'D'].map(key => (
-                  <div key={key} className="flex gap-4 items-center">
-                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 font-black border-2 transition-all
-                      ${formData.respuestaCorrecta === key ? 'bg-emerald-500 border-emerald-500 text-white shadow-lg shadow-emerald-100' : 'bg-slate-50 border-slate-50 text-slate-400'}`}>
-                      {key}
+              <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+                {formData.bloques.map((bloque, idx) => (
+                  <div key={bloque.id} className="relative group bg-slate-50 p-6 rounded-[2rem] border-2 border-transparent hover:border-indigo-100 transition-all">
+                    <div className="absolute -left-3 top-1/2 -translate-y-1/2 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-all">
+                      <button type="button" onClick={() => moveBloque(idx, -1)} className="p-1.5 bg-white shadow-md rounded-full text-slate-400 hover:text-indigo-600"><ArrowUp size={14}/></button>
+                      <button type="button" onClick={() => moveBloque(idx, 1)} className="p-1.5 bg-white shadow-md rounded-full text-slate-400 hover:text-indigo-600"><ArrowDown size={14}/></button>
                     </div>
-                    <input 
-                      required
-                      type="text"
-                      className="flex-1 px-5 py-3.5 bg-slate-50 border-2 border-slate-50 rounded-2xl focus:border-indigo-500 focus:bg-white outline-none transition-all font-bold text-slate-700"
-                      placeholder={`Opción ${key}...`}
-                      value={formData.opciones[key]}
-                      onChange={(e) => handleOpcionChange(key, e.target.value)}
-                    />
-                    <button
+                    
+                    <button 
                       type="button"
-                      onClick={() => setFormData({...formData, respuestaCorrecta: key})}
-                      className={`p-3 rounded-xl transition-all ${formData.respuestaCorrecta === key ? 'text-emerald-500' : 'text-slate-200 hover:text-slate-400'}`}
+                      onClick={() => removeBloque(bloque.id)}
+                      className="absolute -right-2 -top-2 w-8 h-8 bg-white text-rose-500 rounded-full shadow-md flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-rose-500 hover:text-white transition-all z-10"
                     >
-                      <CheckCircle2 size={24} />
+                      <Trash2 size={14} />
                     </button>
+
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="w-6 h-6 rounded-lg bg-indigo-600 text-white flex items-center justify-center text-[10px] font-black">{idx + 1}</span>
+                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                        {bloque.type === 'text' ? 'Bloque de Texto' : 'Bloque de Imagen'}
+                      </span>
+                    </div>
+
+                    {bloque.type === 'text' ? (
+                      <textarea 
+                        required
+                        rows="3"
+                        className="w-full px-4 py-3 bg-white border-2 border-slate-100 rounded-xl focus:border-indigo-500 outline-none transition-all font-bold text-slate-700"
+                        placeholder="Escribe el contenido..."
+                        value={bloque.content}
+                        onChange={(e) => updateBloque(bloque.id, e.target.value)}
+                      />
+                    ) : (
+                      <ImageUploader 
+                        initialImage={bloque.content} 
+                        onImageChange={(data) => updateBloque(bloque.id, data.imagen)} 
+                      />
+                    )}
                   </div>
                 ))}
               </div>
 
-              <div className="space-y-2 pt-4">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Contexto adicional (Opcional)</label>
-                <textarea 
-                  rows="2"
-                  className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-50 rounded-2xl focus:border-indigo-500 focus:bg-white outline-none transition-all font-bold text-slate-600"
-                  placeholder="Situación o planteamiento inicial adicional..."
-                  value={formData.contexto}
-                  onChange={(e) => setFormData({...formData, contexto: e.target.value})}
-                />
+              <div className="space-y-4 pt-6">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Opciones de Respuesta</label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {['A', 'B', 'C', 'D'].map(key => (
+                    <div key={key} className="flex gap-3 items-center bg-slate-50 p-4 rounded-2xl border-2 border-transparent">
+                      <button
+                        type="button"
+                        onClick={() => setFormData({...formData, respuestaCorrecta: key})}
+                        className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 font-black border-2 transition-all
+                          ${formData.respuestaCorrecta === key ? 'bg-emerald-500 border-emerald-500 text-white' : 'bg-white border-slate-100 text-slate-400'}`}
+                      >
+                        {key}
+                      </button>
+                      <input 
+                        required
+                        type="text"
+                        className="flex-1 bg-transparent border-b-2 border-slate-200 focus:border-indigo-500 outline-none py-1 font-bold text-slate-700 text-sm"
+                        placeholder={`Opción ${key}...`}
+                        value={formData.opciones[key]}
+                        onChange={(e) => handleOpcionChange(key, e.target.value)}
+                      />
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
 
-            {/* Right Column: Metadata & Explanations */}
+            {/* Right Column: Metadata & Preview */}
             <div className="space-y-8">
-              {/* Preview Section */}
-              <div className="bg-slate-50 rounded-[2.5rem] p-8 border-2 border-dashed border-slate-200">
-                <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-6">Vista Previa del Ítem</h4>
-                <div className="bg-white rounded-3xl p-8 shadow-sm min-h-[300px]">
-                  <p className="text-base text-slate-900 whitespace-pre-line font-medium mb-6">
-                    {formData.textoInicial || 'Sin texto inicial...'}
-                  </p>
-
-                  {formData.imagen && (
-                    <div className="my-6 flex justify-center bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                      <img
-                        src={formData.imagen}
-                        alt="Vista previa apoyo"
-                        className="max-h-52 rounded-lg object-contain"
-                      />
+              <div className="bg-slate-900 rounded-[2.5rem] p-8 text-white relative overflow-hidden">
+                <h4 className="text-[10px] font-black text-rose-400 uppercase tracking-widest mb-6 flex items-center gap-2">
+                  <ImageIcon size={14} /> Vista Previa
+                </h4>
+                <div className="space-y-6 max-h-[400px] overflow-y-auto pr-4 custom-scrollbar-light">
+                  {formData.bloques.map((b) => (
+                    <div key={b.id}>
+                      {b.type === 'text' ? (
+                        <p className="text-sm font-medium leading-relaxed whitespace-pre-line text-slate-200">
+                          {b.content || <span className="text-slate-600 block bg-slate-800 p-2 rounded italic">Bloque vacío...</span>}
+                        </p>
+                      ) : (
+                        <div className="rounded-2xl border border-white/10 overflow-hidden bg-white/5 flex justify-center p-3">
+                          {b.content ? (
+                            <img src={b.content} alt="Preview" className="max-h-40 rounded-lg object-contain" />
+                          ) : (
+                            <div className="py-10 text-slate-600 text-[10px] font-black uppercase">Sin imagen</div>
+                          )}
+                        </div>
+                      )}
                     </div>
-                  )}
-
-                  {formData.textoPosterior && (
-                    <p className="mt-6 text-base text-slate-900 whitespace-pre-line font-medium mb-6">
-                      {formData.textoPosterior}
-                    </p>
-                  )}
-
-                  <div className="mt-8 space-y-3">
+                  ))}
+                  
+                  <div className="pt-6 border-t border-white/10 grid grid-cols-2 gap-4">
                     {Object.entries(formData.opciones).map(([k, v]) => (
-                      <div key={k} className="flex gap-3 text-sm">
-                        <strong className="text-slate-900 w-6">{k}.</strong> 
-                        <span className="text-slate-600">{v || 'Sin contenido...'}</span>
+                      <div key={k} className="flex gap-2 text-[10px]">
+                        <span className={`w-5 h-5 rounded flex items-center justify-center shrink-0 font-black ${formData.respuestaCorrecta === k ? 'bg-emerald-500 text-white' : 'bg-slate-800 text-slate-500'}`}>{k}</span>
+                        <span className="text-slate-400 truncate">{v || '...'}</span>
                       </div>
                     ))}
                   </div>
                 </div>
               </div>
+
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Competencia</label>
@@ -218,79 +272,26 @@ export default function FormularioPregunta({ pregunta, onSave, onCancel }) {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Componente</label>
-                  <select 
-                    className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-50 rounded-2xl outline-none focus:border-indigo-500 font-bold text-slate-700"
-                    value={formData.componente}
-                    onChange={(e) => setFormData({...formData, componente: e.target.value})}
-                  >
-                    <option>Estadística</option>
-                    <option>Geometría</option>
-                    <option>Álgebra y cálculo</option>
-                  </select>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Imagen URL (Opcional)</label>
-                  <div className="relative">
-                    <ImageIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
-                    <input 
-                      type="text"
-                      className="w-full pl-12 pr-4 py-4 bg-slate-50 border-2 border-slate-50 rounded-2xl outline-none focus:border-indigo-500 font-bold text-slate-700"
-                      placeholder="https://..."
-                      value={formData.imagenUrl}
-                      onChange={(e) => setFormData({...formData, imagenUrl: e.target.value})}
-                    />
-                  </div>
-                </div>
-              </div>
-
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 text-emerald-600">Explicación Respuesta Correcta</label>
+                <label className="text-[10px] font-black text-emerald-600 uppercase tracking-widest ml-1">Explicación Correcta</label>
                 <textarea 
                   required
-                  rows="3"
-                  className="w-full px-6 py-4 bg-emerald-50/30 border-2 border-emerald-50 rounded-2xl focus:border-emerald-500 focus:bg-white outline-none transition-all font-bold text-slate-700"
-                  placeholder="¿Por qué esta es la respuesta correcta?..."
+                  rows="2"
+                  className="w-full px-6 py-4 bg-emerald-50/30 border-2 border-emerald-50 rounded-2xl focus:border-emerald-500 focus:bg-white outline-none transition-all font-bold text-slate-700 text-sm"
                   value={formData.explicacion}
                   onChange={(e) => setFormData({...formData, explicacion: e.target.value})}
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 text-rose-600">Retroalimentación Respuesta Incorrecta</label>
+                <label className="text-[10px] font-black text-rose-600 uppercase tracking-widest ml-1">Feedback Incorrecta</label>
                 <textarea 
                   required
-                  rows="3"
-                  className="w-full px-6 py-4 bg-rose-50/30 border-2 border-rose-50 rounded-2xl focus:border-rose-500 focus:bg-white outline-none transition-all font-bold text-slate-700"
-                  placeholder="Tips para mejorar si el estudiante falla..."
+                  rows="2"
+                  className="w-full px-6 py-4 bg-rose-50/30 border-2 border-rose-50 rounded-2xl focus:border-rose-500 focus:bg-white outline-none transition-all font-bold text-slate-700 text-sm"
                   value={formData.retroalimentacionIncorrecta}
                   onChange={(e) => setFormData({...formData, retroalimentacionIncorrecta: e.target.value})}
                 />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Afirmación</label>
-                  <input 
-                    type="text"
-                    className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-50 rounded-2xl font-bold text-slate-700"
-                    placeholder="..."
-                    value={formData.afirmacion}
-                    onChange={(e) => setFormData({...formData, afirmacion: e.target.value})}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Evidencia</label>
-                  <input 
-                    type="text"
-                    className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-50 rounded-2xl font-bold text-slate-700"
-                    placeholder="..."
-                    value={formData.evidencia}
-                    onChange={(e) => setFormData({...formData, evidencia: e.target.value})}
-                  />
-                </div>
               </div>
             </div>
           </div>
@@ -299,16 +300,16 @@ export default function FormularioPregunta({ pregunta, onSave, onCancel }) {
             <button
               type="button"
               onClick={onCancel}
-              className="flex-1 px-8 py-5 border-2 border-slate-100 rounded-[2rem] font-black text-slate-400 hover:bg-slate-50 transition-all uppercase tracking-widest"
+              className="px-8 py-5 border-2 border-slate-100 rounded-[2rem] font-black text-slate-400 hover:bg-slate-50 transition-all uppercase tracking-widest text-xs"
             >
               Cancelar
             </button>
             <button
               type="submit"
-              className="flex-[2] px-8 py-5 bg-indigo-600 text-white rounded-[2rem] font-black hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-100 flex items-center justify-center gap-3 uppercase tracking-[0.2em]"
+              className="flex-1 px-8 py-5 bg-indigo-600 text-white rounded-[2rem] font-black hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-100 flex items-center justify-center gap-3 uppercase tracking-[0.2em] text-xs"
             >
-              <Save size={24} />
-              Guardar Ítem
+              <Save size={20} />
+              Guardar Pregunta
             </button>
           </div>
         </form>
