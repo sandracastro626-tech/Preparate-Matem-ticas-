@@ -12,9 +12,13 @@ const firebaseConfig = {
   storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || localFirebaseConfig.storageBucket,
   messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || localFirebaseConfig.messagingSenderId,
   appId: import.meta.env.VITE_FIREBASE_APP_ID || localFirebaseConfig.appId,
-  firestoreDatabaseId: import.meta.env.VITE_FIREBASE_DATABASE_ID || localFirebaseConfig.firestoreDatabaseId
+  firestoreDatabaseId: import.meta.env.VITE_FIREBASE_DATABASE_ID || localFirebaseConfig.firestoreDatabaseId || "(default)"
 };
 
+const databaseId = (firebaseConfig.firestoreDatabaseId === '(default)' || !firebaseConfig.firestoreDatabaseId) 
+  ? undefined 
+  : firebaseConfig.firestoreDatabaseId;
+
 const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId); /* CRITICAL: The app will break without this line */
+export const db = getFirestore(app, databaseId); /* CRITICAL: The app will break without this line */
 export const auth = getAuth(app);

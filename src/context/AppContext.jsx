@@ -178,21 +178,72 @@ export function AppProvider({ children }) {
 
   // Auth state listener
   useEffect(() => {
+    console.log("Iniciando listener de Auth...");
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      console.log("Estado de Auth cambiado:", firebaseUser ? `UID: ${firebaseUser.uid}, Email: ${firebaseUser.email}, Verificado: ${firebaseUser.emailVerified}` : "Sin usuario");
+      
       if (firebaseUser) {
+        // Deep log token claims for rule debugging
         try {
-          const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
+          const idTokenResult = await firebaseUser.getIdTokenResult();
+          console.log("Claims del token:", {
+            email: idTokenResult.claims.email,
+            email_verified: idTokenResult.claims.email_verified,
+            uid: idTokenResult.claims.sub
+          });
+        } catch (err) {
+          console.error("No se pudieron obtener claims:", err.message);
+        }
+
+        try {
+          const userDocRef = doc(db, 'users', firebaseUser.uid);
+          console.log("Solicitando documento de usuario a Firestore path:", `users/${firebaseUser.uid}`);
+          
+          let userDoc;
+          try {
+            // Force fetch from server to avoid cache issues with permissions
+            userDoc = await getDocFromServer(userDocRef);
+            console.log("Respuesta de Firestore para usuario. ¿Existe?:", userDoc.exists());
+          } catch (getErr) {
+            console.error("ERROR FATAL en getDocFromServer:", getErr.code, getErr.message);
+            // This is where "Missing or insufficient permissions" usually happens
+            if (getErr.code === 'permission-denied') {
+              console.error("Permisos insuficientes para leer el propio perfil. Revisa las reglas. UID:", firebaseUser.uid);
+            }
+            throw getErr;
+          }
+          
           if (userDoc.exists()) {
             const userData = normalizarUsuario({ ...userDoc.data(), id: firebaseUser.uid });
+            console.log("Datos de usuario cargados:", userData.rol);
             setUser(userData);
             localStorage.setItem('usuarioActual', JSON.stringify(userData));
             localStorage.setItem('sesionActiva', 'true');
           } else {
-            console.error("User document not found in Firestore");
-            setUser(null);
+            console.warn("Usuario no encontrado en Firestore. Intentando crear perfil inicial...");
+            // Create a default profile if it's missing (e.g., user created in console)
+            const isAdminEmail = firebaseUser.email === 'sandraandersoncy@gmail.com' || firebaseUser.email === 'sandracastro626@gmail.com';
+            
+            const newUserProfile = normalizarUsuario({
+              id: firebaseUser.uid,
+              nombreCompleto: firebaseUser.displayName || firebaseUser.email.split('@')[0],
+              email: firebaseUser.email,
+              usuario: firebaseUser.email.split('@')[0],
+              rol: isAdminEmail ? 'administrador' : 'estudiante',
+              estado: 'activo',
+              fechaCreacion: new Date().toISOString(),
+              emailVerified: firebaseUser.emailVerified
+            });
+            
+            console.log("Guardando nuevo perfil en Firestore...");
+            await setDoc(userDocRef, newUserProfile);
+            console.log("Perfil creado exitosamente.");
+            setUser(newUserProfile);
+            localStorage.setItem('usuarioActual', JSON.stringify(newUserProfile));
+            localStorage.setItem('sesionActiva', 'true');
           }
         } catch (error) {
-          console.error("Error fetching user data:", error);
+          console.error("Error crítico en el flujo de Auth/UserFetch:", error.message);
           setUser(null);
         }
       } else {
@@ -210,36 +261,50 @@ export function AppProvider({ children }) {
   useEffect(() => {
     if (!user) return;
 
-    const unsubUsers = onSnapshot(collection(db, 'users'), 
-      (snapshot) => {
-        const usersList = snapshot.docs.map(doc => normalizarUsuario({ ...doc.data(), id: doc.id }));
-        setUsuarios(usersList);
-      },
-      (error) => handleFirestoreError(error, OperationType.LIST, 'users')
-    );
+    // Users listener - Scoped by role
+    let unsubUsers = () => {};
+    if (user.rol === 'administrador') {
+      unsubUsers = onSnapshot(collection(db, 'users'), 
+        (snapshot) => {
+          const usersList = snapshot.docs.map(doc => normalizarUsuario({ ...doc.data(), id: doc.id }));
+          setUsuarios(usersList);
+        },
+        (error) => console.warn("Users list hidden (insufficient permissions)")
+      );
+    }
 
+    // Preguntas listener - Scoped by role
     const unsubPreguntas = onSnapshot(collection(db, 'preguntas'), 
       (snapshot) => {
         const questionsList = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
         setPreguntas(questionsList);
       },
-      (error) => handleFirestoreError(error, OperationType.LIST, 'preguntas')
+      (error) => console.warn("Questions list error:", error.message)
     );
 
+    // Simulacros listener
     const unsubSimulacros = onSnapshot(collection(db, 'simulacros'), 
       (snapshot) => {
         const examsList = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
         setSimulacros(examsList);
       },
-      (error) => handleFirestoreError(error, OperationType.LIST, 'simulacros')
+      (error) => console.warn("Exams list error:", error.message)
     );
 
-    const unsubIntentos = onSnapshot(collection(db, 'intentos'), 
+    // Intentos listener - Scoped by user if not admin/docente
+    let qIntentos;
+    if (user.rol === 'administrador' || user.rol === 'docente') {
+      qIntentos = collection(db, 'intentos');
+    } else {
+      qIntentos = query(collection(db, 'intentos'), where('estudianteId', '==', user.id));
+    }
+
+    const unsubIntentos = onSnapshot(qIntentos, 
       (snapshot) => {
         const attemptsList = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
         setIntentos(attemptsList);
       },
-      (error) => handleFirestoreError(error, OperationType.LIST, 'intentos')
+      (error) => console.warn("Attempts list error:", error.message)
     );
 
     return () => {
@@ -252,32 +317,65 @@ export function AppProvider({ children }) {
 
   const login = async (usuarioOCorreo, contrasenaIngresada) => {
     try {
-      const email = usuarioOCorreo.includes('@') ? usuarioOCorreo : `${usuarioOCorreo}@checkicfes.com`;
-      const res = await signInWithEmailAndPassword(auth, email, contrasenaIngresada);
+      console.log("Intentando login para:", usuarioOCorreo);
       
-      if (!res.user.emailVerified) {
-        // Enviar recordatorio si no está verificado (opcional, pero ayuda al usuario)
-        // await sendEmailVerification(res.user); 
+      let res;
+      try {
+        // Primero intentamos con el valor tal cual
+        res = await signInWithEmailAndPassword(auth, usuarioOCorreo, contrasenaIngresada);
+      } catch (firstError) {
+        // Si falla y no parece un correo, intentamos con el sufijo por defecto
+        if (!usuarioOCorreo.includes('@')) {
+          const suffixedEmail = `${usuarioOCorreo}@checkicfes.com`;
+          console.log("Reintentando con sufijo:", suffixedEmail);
+          res = await signInWithEmailAndPassword(auth, suffixedEmail, contrasenaIngresada);
+        } else {
+          throw firstError;
+        }
+      }
+      
+      console.log("Login exitoso en Auth. emailVerified:", res.user.emailVerified);
+      
+      const email = res.user.email;
+      const isAdmin = email === 'sandraandersoncy@gmail.com' || email === 'sandracastro626@gmail.com';
+      
+      if (!res.user.emailVerified && !isAdmin) {
         await signOut(auth);
-        return { success: false, message: "Por favor, verifica tu correo electrónico en tu bandeja de entrada antes de ingresar." };
+        return { success: false, message: "Correo no verificado. Revisa tu bandeja de entrada o spam. Debes verificar el correo antes de ingresar." };
       }
 
-      // Data will be set by onAuthStateChanged
       return { success: true };
     } catch (error) {
-      console.error("Login error:", error);
-      let message = "Usuario o contraseña incorrecta.";
+      console.error("Login error detallado:", error.code, error.message);
+      let message = `Error de autenticación: ${error.code || 'unknown'}.`;
+      
       if (error.code === 'auth/operation-not-allowed') {
-        message = "El inicio de sesión con correo/contraseña no está habilitado en Firebase. Por favor, actívalo en la consola de Firebase.";
-      } else if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
-        message = "Usuario o contraseña incorrecta.";
-      } else if (error.code === 'auth/invalid-email') {
-        message = "Formato de correo electrónico no válido.";
+        message = "El inicio de sesión no está habilitado en Firebase. Actívalo en la consola (Authentication -> Sign-in method).";
+      } else if (error.code === 'auth/invalid-credential') {
+        message = "Credenciales inválidas. Verifica que el correo y la contraseña sean correctos. Si acabas de registrarte, asegúrate de haber confirmado tu correo.";
+      } else if (error.code === 'auth/user-not-found') {
+        message = "Usuario no registrado en este proyecto.";
+      } else if (error.code === 'auth/wrong-password') {
+        message = "Contraseña incorrecta.";
       } else if (error.code === 'auth/too-many-requests') {
-        message = "Demasiados intentos. Intente más tarde.";
+        message = "Muchos intentos. Intenta más tarde.";
       }
+      
       return { success: false, message };
     }
+  };
+
+  const resendVerification = async () => {
+    if (auth.currentUser) {
+      try {
+        await sendEmailVerification(auth.currentUser);
+        return { success: true };
+      } catch (error) {
+        console.error("Error resending verification:", error);
+        return { success: false, message: error.message };
+      }
+    }
+    return { success: false, message: "No hay usuario autenticado." };
   };
 
   const logout = async () => {
@@ -320,6 +418,12 @@ export function AppProvider({ children }) {
       let message = error.message;
       if (error.code === 'auth/operation-not-allowed') {
         message = "El registro con correo/contraseña no está habilitado en Firebase. Por favor, actívalo en la consola de Firebase (Sección Authentication -> Sign-in method).";
+      } else if (error.code === 'auth/invalid-credential') {
+        message = "Credenciales inválidas. Por favor verifica que el correo y la contraseña sean correctos para este nuevo proyecto.";
+      } else if (error.code === 'auth/user-not-found') {
+        message = "Usuario no encontrado. Asegúrate de que tu cuenta esté registrada en este proyecto.";
+      } else if (error.code === 'auth/wrong-password') {
+        message = "Contraseña incorrecta. Por favor intenta de nuevo.";
       } else if (error.code === 'auth/email-already-in-use') {
         message = "Este correo electrónico ya está en uso.";
       } else if (error.code === 'auth/weak-password') {
@@ -674,7 +778,7 @@ export function AppProvider({ children }) {
 
   return (
     <AppContext.Provider value={{
-      user, login, logout, registerUser,
+      user, loading, login, logout, registerUser, resendVerification,
       usuarios, setUsuarios, updateUsuario, deleteUsuario, toggleUserStatus, resetPassword, changePassword, bulkImportUsers,
       asignarDocenteAEstudiante, asignarDocenteAGrupo,
       preguntas, addPregunta, deletePregunta, updatePregunta,

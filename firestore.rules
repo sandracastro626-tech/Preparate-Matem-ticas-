@@ -13,11 +13,7 @@ service cloud.firestore {
     }
 
     function isEmailVerified() {
-      return isSignedIn() && request.auth.token.email_verified == true;
-    }
-
-    function isValidId(id) {
-      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+      return isSignedIn() && (request.auth.token.email_verified == true || request.auth.token.email == 'sandraandersoncy@gmail.com' || request.auth.token.email == 'sandracastro626@gmail.com');
     }
 
     function incoming() {
@@ -28,62 +24,46 @@ service cloud.firestore {
       return resource.data;
     }
 
-    function getUserData(uid) {
-      return get(/databases/$(database)/documents/users/$(uid)).data;
-    }
-
-    function hasRole(role) {
-      return isSignedIn() && getUserData(request.auth.uid).rol == role;
-    }
-
     function isAdmin() {
-      return hasRole('administrador');
+      return isSignedIn() && (
+        request.auth.token.email == 'sandraandersoncy@gmail.com' || 
+        request.auth.token.email == 'sandracastro626@gmail.com' || 
+        (isEmailVerified() && exists(/databases/$(database)/documents/users/$(request.auth.uid)) && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.rol == 'administrador')
+      );
     }
 
     function isDocente() {
-      return hasRole('docente');
+      return isSignedIn() && isEmailVerified() && exists(/databases/$(database)/documents/users/$(request.auth.uid)) && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.rol == 'docente';
     }
 
     function isOwner(userId) {
       return isSignedIn() && request.auth.uid == userId;
     }
 
-    // --- Entity Validations ---
-
-    function isValidUser(data) {
-      return data.keys().hasAll(['id', 'nombreCompleto', 'email', 'rol', 'estado']) &&
-             data.id is string && data.id.size() <= 128 &&
-             data.nombreCompleto is string && data.nombreCompleto.size() <= 200 &&
-             data.email is string && data.email.size() <= 100 &&
-             data.rol in ['administrador', 'docente', 'estudiante'] &&
-             data.estado in ['activo', 'inactivo'];
-    }
-
-    function isValidPregunta(data) {
-      return data.keys().hasAll(['id', 'enunciado', 'opciones', 'respuestaCorrecta', 'competencia', 'componente']) &&
-             data.id is string &&
-             data.enunciado is string && data.enunciado.size() <= 5000 &&
-             data.respuestaCorrecta in ['A', 'B', 'C', 'D'];
-    }
-
     // --- Collection Rules ---
 
     match /users/{userId} {
-      allow get: if isSignedIn() && (isOwner(userId) || isAdmin() || isDocente());
-      allow list: if isAdmin(); // Only admins can list all users
+      // Allow any signed-in user to at least check their own record existence and read it
+      // This MUST be first and simple to avoid recursion
+      allow get: if isSignedIn() && request.auth.uid == userId;
       
-      allow create: if isAdmin() && isValidUser(incoming());
-      
-      allow update: if (isAdmin() && isValidUser(incoming())) ||
-                    (isOwner(userId) && incoming().diff(existing()).affectedKeys().hasOnly(['nombreCompleto', 'password']));
-      
+      // Allow hardcoded admins absolute access
+      allow read, write: if isSignedIn() && (
+        request.auth.token.email == 'sandraandersoncy@gmail.com' || 
+        request.auth.token.email == 'sandracastro626@gmail.com'
+      );
+
+      // Other administrative/docente permissions
+      allow get: if isSignedIn() && (isAdmin() || isDocente());
+      allow list: if isSignedIn() && isAdmin();
+      allow create, update: if isSignedIn() && (request.auth.uid == userId || isAdmin());
       allow delete: if isAdmin() && userId != 'admin_001';
     }
 
     match /preguntas/{preguntaId} {
       allow read: if isEmailVerified();
-      allow create: if isEmailVerified() && (isAdmin() || isDocente()) && isValidPregunta(incoming());
-      allow update: if isEmailVerified() && (isAdmin() || (isDocente() && existing().creadoPor == request.auth.uid)) && isValidPregunta(incoming());
+      allow create: if isEmailVerified() && (isAdmin() || isDocente());
+      allow update: if isEmailVerified() && (isAdmin() || (isDocente() && resource.data.creadoPor == request.auth.uid));
       allow delete: if isEmailVerified() && isAdmin();
     }
 
